@@ -27,6 +27,7 @@ GLfloat window_width = 800.0;
 GLfloat window_height = 800.0;
 vector<Object3D> objects = vector<Object3D>();
 int selected_object = 0;
+double ia = 1;
 
 void myreshape (GLsizei w, GLsizei h)
 {
@@ -50,11 +51,15 @@ void mydisplay()
 
 	
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	for (int j = 0; j < objects.size();j++) {
-		if(j == selected_object) glColor3f(1, 0.54902, 0);//1 0.54902 0
-		else glColor3f(1, 1, 1);
+		//if(j == selected_object) glColor3f(1, 0.54902, 0);
+		//else glColor3f(1, 1, 1);
+		double a = ia*objects[j].r;
+		double b = ia*objects[j].g;
+		double c = ia*objects[j].b;
+		glColor3f(a, b, c);
 		glPushMatrix();
 		glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
 		//glRotatef(objects[j].angleX, 1, 0, 0);
@@ -137,7 +142,11 @@ void hadleSpecialKeyboard(int key, int x, int y)
 int main(int argc, char **argv)
 {
 	objects.push_back(readObject("pumpkin.obj"));
+	objects[0].selectka(0.6);
+	objects[0].selectColor(1, 0.54902, 0);
 	objects.push_back(readObject("teste.obj"));
+	objects[1].selectka(0.6);
+	objects[1].selectColor(1,1,1);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(window_width, window_height);
