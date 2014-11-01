@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 	glutReshapeFunc(myreshape);
 	glutMouseFunc(handleMouse);
 	glutMotionFunc(handleMotion);
-	glutKeyboardUpFunc(hadleKeyboard);
+	glutKeyboardFunc(hadleKeyboard);
 	glutSpecialUpFunc(hadleSpecialKeyboard);
 
 	glutMainLoop();
