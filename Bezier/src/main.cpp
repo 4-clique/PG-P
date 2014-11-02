@@ -128,6 +128,7 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key == ',') {
 		selected_object = (selected_object - 1) % objects.size();
 	}
+
 }
 
 void hadleSpecialKeyboard(int key, int x, int y)

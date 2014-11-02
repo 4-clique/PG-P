@@ -1,4 +1,4 @@
-﻿Build started 31/10/2014 15:48:17.
+﻿Build started 01/11/2014 00:15:46.
      1>Project "C:\Users\Stor\Desktop\VictorM\PG-P\Bezier\Bezier.vcxproj" on node 2 (Build target(s)).
      1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(381,5): warning MSB8028: The intermediate directory (C:\Users\Stor\Desktop\VictorM\PG-P\Debug\) contains files shared from another project (Bezier.vcxproj).  This can lead to incorrect clean and rebuild behavior.
      1>ClCompile:
@@ -18,4 +18,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.08
+Time Elapsed 00:00:03.61
