@@ -25,9 +25,12 @@ using namespace std;
 GLfloat mouse_x, mouse_y;
 GLfloat window_width = 800.0;
 GLfloat window_height = 800.0;
+//double myScreen[800][800];
 vector<Object3D> objects = vector<Object3D>();
 int selected_object = 0;
 double ia = 1;
+double il = 1;
+LightSource source1 = LightSource(0,0,0); // no centro do mundo
 
 void myreshape (GLsizei w, GLsizei h)
 {
@@ -53,13 +56,7 @@ void mydisplay()
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	for (int j = 0; j < objects.size();j++) {
-		//if(j == selected_object) glColor3f(1, 0.54902, 0);
-		//else glColor3f(1, 1, 1);
-		double a = ia*objects[j].r;
-		double b = ia*objects[j].g;
-		double c = ia*objects[j].b;
-		glColor3f(a, b, c);
+	for (int j = 0; j < objects.size();j++) {		
 		glPushMatrix();
 		glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
 		//glRotatef(objects[j].angleX, 1, 0, 0);
@@ -67,6 +64,10 @@ void mydisplay()
 		glRotatef(objects[j].angleZ, 0, 0, 1);
 		glScaled(objects[j].scale, objects[j].scale, objects[j].scale);
 		for (int i = 0; i < objects[j].faces.size(); i++) {
+			double a = ((ia*objects[j].ka)*objects[j].r + (il*objects[j].kd*objects[j].prod[i])*source1.r);
+			double b = ((ia*objects[j].ka)*objects[j].g + (il*objects[j].kd*objects[j].prod[i])*source1.g);
+			double c = ((ia*objects[j].ka)*objects[j].b + (il*objects[j].kd*objects[j].prod[i])*source1.b);
+			glColor3f(a,b,c);
 			glBegin(GL_TRIANGLES);
 			glVertex3f(objects[j].points[objects[j].faces[i].p1].x, objects[j].points[objects[j].faces[i].p1].y, objects[j].points[objects[j].faces[i].p1].z);
 			glVertex3f(objects[j].points[objects[j].faces[i].p2].x, objects[j].points[objects[j].faces[i].p2].y, objects[j].points[objects[j].faces[i].p2].z);
@@ -141,12 +142,25 @@ void hadleSpecialKeyboard(int key, int x, int y)
 
 int main(int argc, char **argv)
 {
-	objects.push_back(readObject("pumpkin.obj"));
+	source1.setColor(1, 1, 1);
+	//setando objeto 0:
+	/*objects.push_back(readObject("pumpkin.obj"));
 	objects[0].selectka(0.6);
+	objects[0].selectkd(0.5);
 	objects[0].selectColor(1, 0.54902, 0);
-	objects.push_back(readObject("teste.obj"));
-	objects[1].selectka(0.6);
-	objects[1].selectColor(1,1,1);
+	objects[0].recalculate(source1.location);*/
+	//setando objeto 1:
+	objects.push_back(readObject("dog.obj"));
+	objects[0].selectka(0.6);
+	objects[0].selectkd(0.5);
+	objects[0].selectColor(0.7, 0.5, 0);
+	objects[0].recalculate(source1.location);
+	//setando objeto 2:
+	/*objects.push_back(readObject("teste.obj"));
+	objects[2].selectka(0.6);
+	objects[2].selectkd(0.5);
+	objects[2].selectColor(1,1,1);
+	objects[2].recalculate(source1.location);*/
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(window_width, window_height);
@@ -162,3 +176,4 @@ int main(int argc, char **argv)
 	glutMainLoop();
 	return 0;
 }
+

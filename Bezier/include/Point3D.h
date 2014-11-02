@@ -50,6 +50,13 @@ public:
 		z /= c;
 		return *this;
 	};
+	Point3D operator / (double c){
+		x /= c;
+		y /= c;
+		z /= c;
+		return *this;
+	}
+
 private:
 
 };
