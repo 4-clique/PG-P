@@ -27,6 +27,8 @@ public:
 	double altX = 0, altY = 0, altZ = 0;
 	double angleX = 0, angleY = 0, angleZ = 0;
 	double scale = 1;
+	double ka;
+	double r, g, b;
 
 	Object3D() {
 		points = vector<Point3D>();
@@ -68,6 +70,18 @@ public:
 			}
 		}
 		takeBack();
+	}
+
+	void selectka(double a) {
+		if (a<=1.0 && a>=0.0){
+			ka = a;
+		}
+	}
+
+	void selectColor(double c1, double c2, double c3) {
+		r = c1;
+		g = c2;
+		b = c3;
 	}
 
 private:
