@@ -22,7 +22,7 @@ public:
 			center.x += (direction.x - c.x) / transZ;
 			direction.x += (direction.x - c.x) / transZ;
 			center.y += (direction.y - c.y) / transZ;
-			direction.y += (direction.x - c.y) / transZ;
+			direction.y += (direction.y - c.y) / transZ;
 			center.z += (direction.z - c.z) / transZ;
 			direction.z += (direction.z - c.z) / transZ;
 		}

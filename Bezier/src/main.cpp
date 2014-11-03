@@ -33,9 +33,6 @@ double ia = 1;
 
 //Propriedades da Camera
 Camera camera = Camera(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL);
-double lx = 0, ly = 1; //line of sight
-double eyeX = 0, eyeY = 0, eyeZ = 1; //posição da câmera
-float angle = 0.0f;
 
 //Movimento do mouse;
 int mouseInicialX = 0;
@@ -54,7 +51,6 @@ void myreshape (GLsizei w, GLsizei h)
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
 	gluPerspective(45, ratio, 0, 3000);
-	// a visão de objetos mais distantes
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -67,9 +63,6 @@ void mydisplay(void)
 	glLoadIdentity(); //Substitui matrizes pela identidade (sem isso a câmera não funciona bem)
 	
 	//Look At Point = Line Of Sight + Camera Position >> em gluLookAt, os parâmetros centerX e centerZ são baseados nessa equação
-	/*gluLookAt(eyeX,eyeY,eyeZ,
-		eyeX, 0, eyeZ-CAMERAZ_INICIAL,
-		0, 1, 0);*/
 	gluLookAt(camera.center.x, camera.center.y, camera.center.z, 
 		camera.direction.x, camera.direction.y, camera.direction.z,
 		camera.way.x, camera.way.y, camera.way.z);
