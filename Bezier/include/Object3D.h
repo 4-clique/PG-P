@@ -25,12 +25,15 @@ public:
 	vector<Face3D> faces;
 	vector<Point3D> normais;
 	vector<Point3D> f1; // para fonte de luz 1
+	vector<Point3D> r1; // guarda as reflexoes de f1
+	vector<Point3D> v; //guarda os v - que apontam para o observador
 	vector<double> prod; //produto interno
 	Point3D bariCenter;
 	double altX = 0, altY = 0, altZ = 0;
 	double angleX = 0, angleY = 0, angleZ = 0;
 	double scale = 1;
-	double ka, kd; //ka é coeficiente de reflexao ambiente, kb é coeficiente de reflexao difusa
+	double ka, kd, ks; //ka é coeficiente de reflexao ambiente, kb é coeficiente de reflexao difusa, ks é de especular
+	double q; //para calculo da especular
 	double r, g, b;
 
 	Object3D() {
@@ -77,6 +80,23 @@ public:
 			f1.push_back(ver);
 		}
 	}
+	//erro nesse metodo
+	void calculateR1() {
+		for (int i = 0; i < faces.size(); i++) {
+			double aux = normais[i].x*f1[i].x + normais[i].y*f1[i].y + normais[i].z*f1[i].z;
+			Point3D res = (normais[i] * (2 * aux)) - f1[i];
+			/*Point3D res;
+			res.x = (2 * aux*normais[i].x) - f1[i].x;
+			res.y = (2 * aux*normais[i].y) - f1[i].y;
+			res.z = (2 * aux*normais[i].z) - f1[i].z;*/
+
+			//normalizando:
+			double div = sqrt(res.x*res.x + res.y*res.y + res.z*res.z);
+			res = res / div;
+			
+			r1.push_back(res);
+		}
+	}
 
 	void calculateNormal() { 
 		for (int i = 0; i < faces.size(); i++) {
@@ -103,6 +123,24 @@ public:
 			
 			normais.push_back(res);
 		}
+	}
+
+	void calculateV(double eyeX, double eyeY, double eyeZ) {
+		for (int i = 0; i < faces.size(); i++) {
+			Point3D bar;
+			bar.x = (points[faces[i].p1].x + points[faces[i].p2].x + points[faces[i].p3].x) / 3;
+			bar.y = (points[faces[i].p1].y + points[faces[i].p2].y + points[faces[i].p3].y) / 3;
+			bar.z = (points[faces[i].p1].z + points[faces[i].p2].z + points[faces[i].p3].z) / 3;
+
+			Point3D ver = bar - Point3D(eyeX, eyeY, eyeZ);
+
+			//normaliza:
+			double div = sqrt(ver.x*ver.x + ver.y*ver.y + ver.z*ver.z);
+			ver = ver / div;
+
+			v.push_back(ver);
+		}
+
 	}
 
 	void RotateMatrix(double degrees, char axis){
@@ -140,16 +178,28 @@ public:
 		}
 	}
 
+	void selectks(double a) {
+		if (a <= 1.0 && a >= 0.0){
+			ks = a;
+		}
+	}
+	
+	void selectq(double a) {
+		q = a;
+	}
+
 	void selectColor(double c1, double c2, double c3) {
 		r = c1;
 		g = c2;
 		b = c3;
 	}
 
-	void recalculate(Point3D fonte){
+	void recalculate(Point3D fonte, double eyeX, double eyeY, double eyeZ){
 		calculateF1(fonte);
 		calculateNormal();
+		calculateR1();
 		calculateProd();
+		calculateV(eyeX, eyeY, eyeZ);
 	}
 
 private:

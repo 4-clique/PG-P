@@ -22,14 +22,16 @@ Referencia online para os comandos OpenGL (Man pages):
 
 
 using namespace std;
-GLfloat mouse_x, mouse_y;
-GLfloat window_width = 800.0;
-GLfloat window_height = 800.0;
-//double myScreen[800][800];
+double mouse_x, mouse_y;
+double window_width = 800.0;
+double window_height = 800.0;
+double buffer[800][800];
 vector<Object3D> objects = vector<Object3D>();
 int selected_object = 0;
 double ia = 1;
 double il = 1;
+double is = 20;
+double eyeX = 0, eyeY = 0, eyeZ = 100;
 LightSource source1 = LightSource(0,0,0); // no centro do mundo
 
 void myreshape (GLsizei w, GLsizei h)
@@ -40,7 +42,19 @@ void myreshape (GLsizei w, GLsizei h)
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
 	gluPerspective(45, w/h, 0, 1);
-	gluLookAt(0, 0, 100, 0, 0, 0, 0, 1, 1);
+	gluLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 1);
+}
+
+void resetBuffer(){
+	for (int i = 0; i < 800;i++) {
+		for (int j = 0; j < 800;j++) {
+			buffer[i][j] = DBL_MAX;
+		}
+	}
+}
+
+double produtoInterno(Point3D a, Point3D b){
+	return (a.x*b.x + a.y*b.y + a.z*b.z);
 }
 
 void mydisplay()
@@ -55,7 +69,7 @@ void mydisplay()
 	
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
+	
 	for (int j = 0; j < objects.size();j++) {		
 		glPushMatrix();
 		glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
@@ -63,10 +77,11 @@ void mydisplay()
 		glRotatef(objects[j].angleY, 0, 1, 0);
 		glRotatef(objects[j].angleZ, 0, 0, 1);
 		glScaled(objects[j].scale, objects[j].scale, objects[j].scale);
+
 		for (int i = 0; i < objects[j].faces.size(); i++) {
-			double a = ((ia*objects[j].ka)*objects[j].r + (il*objects[j].kd*objects[j].prod[i])*source1.r);
-			double b = ((ia*objects[j].ka)*objects[j].g + (il*objects[j].kd*objects[j].prod[i])*source1.g);
-			double c = ((ia*objects[j].ka)*objects[j].b + (il*objects[j].kd*objects[j].prod[i])*source1.b);
+			double a = (ia*objects[j].ka)*objects[j].r + (il*objects[j].kd*objects[j].prod[i])*source1.r +(il*is*objects[j].ks*pow(produtoInterno(objects[j].r1[i], objects[j].v[i]), objects[j].q)*source1.r)/255;
+			double b = ((ia*objects[j].ka)*objects[j].g + (il*objects[j].kd*objects[j].prod[i])*source1.g) +(il*is*objects[j].ks*pow(produtoInterno(objects[j].r1[i], objects[j].v[i]), objects[j].q)*source1.g)/255;
+			double c = ((ia*objects[j].ka)*objects[j].b + (il*objects[j].kd*objects[j].prod[i])*source1.b) +(il*is*objects[j].ks*pow(produtoInterno(objects[j].r1[i], objects[j].v[i]), objects[j].q)*source1.b)/255;
 			glColor3f(a,b,c);
 			glBegin(GL_TRIANGLES);
 			glVertex3f(objects[j].points[objects[j].faces[i].p1].x, objects[j].points[objects[j].faces[i].p1].y, objects[j].points[objects[j].faces[i].p1].z);
@@ -134,6 +149,9 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key == ',') {
 		selected_object = (selected_object - 1) % objects.size();
 	}
+	/*for (int i = 0; i < objects.size();i++){
+		objects[i].recalculate(source1.location, eyeX, eyeY, eyeZ);
+	}*/
 }
 
 void hadleSpecialKeyboard(int key, int x, int y)
@@ -142,23 +160,29 @@ void hadleSpecialKeyboard(int key, int x, int y)
 
 int main(int argc, char **argv)
 {
+	resetBuffer();
 	source1.setColor(1, 1, 1);
 	//setando objeto 0:
-	/*objects.push_back(readObject("pumpkin.obj"));
+	objects.push_back(readObject("pumpkin.obj"));
 	objects[0].selectka(0.6);
 	objects[0].selectkd(0.5);
+	objects[0].selectks(0.1);
+	objects[0].selectq(1);
 	objects[0].selectColor(1, 0.54902, 0);
-	objects[0].recalculate(source1.location);*/
+	objects[0].recalculate(source1.location, eyeX, eyeY, eyeZ);
 	//setando objeto 1:
 	objects.push_back(readObject("dog.obj"));
-	objects[0].selectka(0.6);
-	objects[0].selectkd(0.5);
-	objects[0].selectColor(0.7, 0.5, 0);
-	objects[0].recalculate(source1.location);
+	objects[1].selectka(0.6);
+	objects[1].selectkd(0.5);
+	objects[1].selectks(0.1);
+	objects[1].selectq(1);
+	objects[1].selectColor(0.7, 0.5, 0);
+	objects[1].recalculate(source1.location, eyeX, eyeY, eyeZ);
 	//setando objeto 2:
 	/*objects.push_back(readObject("teste.obj"));
 	objects[2].selectka(0.6);
 	objects[2].selectkd(0.5);
+	objects[2].selectks(0.5);
 	objects[2].selectColor(1,1,1);
 	objects[2].recalculate(source1.location);*/
 	glutInit(&argc, argv);
