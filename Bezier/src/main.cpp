@@ -19,6 +19,7 @@ Referencia online para os comandos OpenGL (Man pages):
 
 #include "openGL_tutorial.h"
 #include <Transform.h>
+#include <Camera.h>
 #include <iostream>
 #include <math.h>
 
@@ -30,9 +31,15 @@ vector<Object3D> objects = vector<Object3D>();
 int selected_object = 0;
 double ia = 1;
 
-float lx = 0.0f, lz = -1.0f; //line of sight
-float eyeX = 0.0f, eyeZ = 5.0f; //posição da câmera
+//Propriedades da Camera
+Camera camera = Camera(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL);
+double lx = 0, ly = 1; //line of sight
+double eyeX = 0, eyeY = 0, eyeZ = 1; //posição da câmera
 float angle = 0.0f;
+
+//Movimento do mouse;
+int mouseInicialX = 0;
+int mouseInicialY = 0;
 
 void myreshape (GLsizei w, GLsizei h)
 {
@@ -46,8 +53,8 @@ void myreshape (GLsizei w, GLsizei h)
 	glViewport(0, 0, w, h);
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
-	gluPerspective(45, ratio, 0, 1);
-	gluLookAt(0, 0, 100, 0, 0, 0, 0, 1, 1); // a visão de objetos mais distantes
+	gluPerspective(45, ratio, 0, 3000);
+	// a visão de objetos mais distantes
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -60,10 +67,14 @@ void mydisplay(void)
 	glLoadIdentity(); //Substitui matrizes pela identidade (sem isso a câmera não funciona bem)
 	
 	//Look At Point = Line Of Sight + Camera Position >> em gluLookAt, os parâmetros centerX e centerZ são baseados nessa equação
+	/*gluLookAt(eyeX,eyeY,eyeZ,
+		eyeX, 0, eyeZ-CAMERAZ_INICIAL,
+		0, 1, 0);*/
+	gluLookAt(camera.center.x, camera.center.y, camera.center.z, 
+		camera.direction.x, camera.direction.y, camera.direction.z,
+		camera.way.x, camera.way.y, camera.way.z);
+	
 
-	gluLookAt(eyeX, 1.0f, eyeZ, //visão do observador
-		eyeX + lx, 1.0f, eyeZ + lz, //lx e lz estão relacionados com o giro da câmera para direita e esquerda
-		.0f, 1.0f, .0f); //plano de visão da câmera, mudar um dos parâmetros, altera a inclinação do mundo
 
 	double x = 0;
 	double y = 0;
@@ -94,17 +105,33 @@ void mydisplay(void)
 		glPopMatrix();
 	}
 
-	
+	glPushMatrix();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glColor3f(0.25, 0.75, 0);
+	glBegin(GL_QUADS);
+	glVertex3f(-250,-100,250);
+	glVertex3f(250, -100, 250);
+	glVertex3f(250, -100, -250);
+	glVertex3f(-250, -100, -250);
+	glEnd();
+	glPopMatrix();
+
 	glFlush();
 	glutPostRedisplay();
 }
 
 void handleMotion(int x, int y)
 {
+	camera.RotateMatrix((x - mouseInicialX)/ROTAT_CAMERA, 'y');
+	camera.RotateMatrix((y - mouseInicialY) / ROTAT_CAMERA, 'x');
 }
 
 void handleMouse(int btn, int state, int x, int y)
 {
+	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		mouseInicialX = x;
+		mouseInicialY = y;
+	}
 }
 
 void hadleKeyboard(unsigned char key, int x, int y)
@@ -152,25 +179,20 @@ void hadleKeyboard(unsigned char key, int x, int y)
 		selected_object = (selected_object - 1) % objects.size();
 	}
 
-	if (key == 'a'){ //câmera gira para a esquerda (objetos vão ficando pra direita)
-		angle -= 0.01f;
-		lx = sin(angle);
-		lz = -cos(angle);
+	if (key == 'a'){
+		camera.translate(MOVE_CAMERA, 0, 0);
 	}
-	if (key == 'd'){ //câmera gira para a direita (objetos vão ficando pra esquerda)
-		angle += 0.01f;
-		lx = sin(angle);
-		lz = -cos(angle);
+	if (key == 'd'){
+		camera.translate(-MOVE_CAMERA, 0, 0);
 	}
 
-	// lx ou lz multiplicados por um fator de aproximação; quanto maior, mais rápido se aproxima dos objetos
 	if (key == 'w'){ //aproximação da câmera
-		eyeX += lx * 2;
-		eyeZ += lz * 2;
+		camera.translate(0, 0, MOVE_CAMERA);
+		//camera.translate(0, 0, -((camera.center.z - camera.direction.z) / abs(camera.center.z - camera.direction.z))*MOVE_CAMERA);
 	}
 	if (key == 's'){ //afastamento da câmera
-		eyeX -= lx * 2;
-		eyeZ -= lz * 2;
+		camera.translate(0, 0, -MOVE_CAMERA);
+		//camera.translate(0, 0, ((camera.center.z - camera.direction.z) / abs(camera.center.z - camera.direction.z))*MOVE_CAMERA);
 	}
 }
 

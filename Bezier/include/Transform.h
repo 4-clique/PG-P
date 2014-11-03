@@ -17,6 +17,11 @@
 #include <set>
 const double TRANS_SCALA = 1;
 const double ROTAT_SCALA = 4;
+const double MOVE_CAMERA = 10;
+const double ROTAT_CAMERA = 50;
+const double CAMERAX_INICIAL = 0;
+const double CAMERAY_INICIAL = 0;
+const double CAMERAZ_INICIAL = 10;
 
 Object3D readObject(string arquivo){
 	ifstream ifs(arquivo, ifstream::in);

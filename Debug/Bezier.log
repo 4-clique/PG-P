@@ -1,16 +1,16 @@
-﻿Build started 01/11/2014 00:15:46.
+﻿Build started 03/11/2014 01:14:38.
      1>Project "C:\Users\Stor\Desktop\VictorM\PG-P\Bezier\Bezier.vcxproj" on node 2 (Build target(s)).
      1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(381,5): warning MSB8028: The intermediate directory (C:\Users\Stor\Desktop\VictorM\PG-P\Debug\) contains files shared from another project (Bezier.vcxproj).  This can lead to incorrect clean and rebuild behavior.
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\Stor\Desktop\VictorM\PG-P\Bezier\include\\" /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\\" /Fd"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt src\main.cpp
          main.cpp
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(53): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(59): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(65): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(75): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(81): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\src\main.cpp(55): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\src\main.cpp(64): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(55): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(61): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(67): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(89): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(95): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\stor\desktop\victorm\pg-p\bezier\src\main.cpp(85): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\stor\desktop\victorm\pg-p\bezier\src\main.cpp(98): warning C4018: '<' : signed/unsigned mismatch
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\ProjetoPG.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Stor\Desktop\VictorM\PG-P\Bezier\lib\\" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\ProjetoPG.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\ProjetoPG.lib" /MACHINE:X86 "C:\Users\Stor\Desktop\VictorM\PG-P\Debug\main.obj"
          Bezier.vcxproj -> C:\Users\Stor\Desktop\VictorM\PG-P\Debug\ProjetoPG.exe
@@ -18,4 +18,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:03.61
+Time Elapsed 00:00:01.24

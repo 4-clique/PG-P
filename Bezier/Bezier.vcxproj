@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Face3D.h" />
     <ClInclude Include="include\Object3D.h" />
     <ClInclude Include="include\openGL_tutorial.h" />
