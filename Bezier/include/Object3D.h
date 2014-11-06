@@ -64,85 +64,6 @@ public:
 		}
 	}
 
-	void calculateF1(Point3D fonte){
-		for (int i = 0; i < faces.size();i++) {
-			Point3D bar;
-			bar.x = (points[faces[i].p1].x + points[faces[i].p2].x + points[faces[i].p3].x) / 3;
-			bar.y = (points[faces[i].p1].y + points[faces[i].p2].y + points[faces[i].p3].y) / 3;
-			bar.z = (points[faces[i].p1].z + points[faces[i].p2].z + points[faces[i].p3].z) / 3;
-
-			Point3D ver = bar - fonte;
-
-			//normaliza:
-			double div = sqrt(ver.x*ver.x + ver.y*ver.y + ver.z*ver.z);
-			ver = ver/ div;
-
-			f1.push_back(ver);
-		}
-	}
-	//erro nesse metodo
-	void calculateR1() {
-		for (int i = 0; i < faces.size(); i++) {
-			double aux = normais[i].x*f1[i].x + normais[i].y*f1[i].y + normais[i].z*f1[i].z;
-			Point3D res = (normais[i] * (2 * aux)) - f1[i];
-			/*Point3D res;
-			res.x = (2 * aux*normais[i].x) - f1[i].x;
-			res.y = (2 * aux*normais[i].y) - f1[i].y;
-			res.z = (2 * aux*normais[i].z) - f1[i].z;*/
-
-			//normalizando:
-			double div = sqrt(res.x*res.x + res.y*res.y + res.z*res.z);
-			res = res / div;
-			
-			r1.push_back(res);
-		}
-	}
-
-	void calculateNormal() { 
-		for (int i = 0; i < faces.size(); i++) {
-			Point3D v1, v2, res;
-			Point3D a = points[faces[i].p1];
-			Point3D b = points[faces[i].p2];
-			Point3D c = points[faces[i].p3];
-			v1.x = b.x - a.x;
-			v1.y = b.y - a.y;
-			v1.z = b.z - a.z;
-			
-			v2.x = c.x - a.x;
-			v2.y = c.y - a.y;
-			v2.z = c.z - a.z;
-
-			//produto vetorial:
-			res.x = (v1.y * v2.z) - (v1.z * v2.y);
-			res.y = (v1.z * v2.x) - (v1.x*v2.z);
-			res.z = (v1.x * v2.y) - (v1.y*v2.x);
-			
-			//normalizando:
-			double div = sqrt(res.x*res.x + res.y*res.y + res.z*res.z);
-			res = res / div;
-			
-			normais.push_back(res);
-		}
-	}
-
-	void calculateV(double eyeX, double eyeY, double eyeZ) {
-		for (int i = 0; i < faces.size(); i++) {
-			Point3D bar;
-			bar.x = (points[faces[i].p1].x + points[faces[i].p2].x + points[faces[i].p3].x) / 3;
-			bar.y = (points[faces[i].p1].y + points[faces[i].p2].y + points[faces[i].p3].y) / 3;
-			bar.z = (points[faces[i].p1].z + points[faces[i].p2].z + points[faces[i].p3].z) / 3;
-
-			Point3D ver = bar - Point3D(eyeX, eyeY, eyeZ);
-
-			//normaliza:
-			double div = sqrt(ver.x*ver.x + ver.y*ver.y + ver.z*ver.z);
-			ver = ver / div;
-
-			v.push_back(ver);
-		}
-
-	}
-
 	void RotateMatrix(double degrees, char axis){
 		take2Center();
 		if (axis == 'x'){
@@ -195,11 +116,74 @@ public:
 	}
 
 	void recalculate(Point3D fonte, double eyeX, double eyeY, double eyeZ){
-		calculateF1(fonte);
-		calculateNormal();
-		calculateR1();
-		calculateProd();
-		calculateV(eyeX, eyeY, eyeZ);
+		for (int i = 0; i < faces.size(); i++) {
+			//f1:
+			Point3D barr;
+			barr.x = (points[faces[i].p1].x + points[faces[i].p2].x + points[faces[i].p3].x) / 3;
+			barr.y = (points[faces[i].p1].y + points[faces[i].p2].y + points[faces[i].p3].y) / 3;
+			barr.z = (points[faces[i].p1].z + points[faces[i].p2].z + points[faces[i].p3].z) / 3;
+
+			Point3D verr = barr - fonte;
+
+			//normaliza:
+			double divi = sqrt(verr.x*verr.x + verr.y*verr.y + verr.z*verr.z);
+			verr = verr / divi;
+
+			f1.push_back(verr);
+			
+			//normal:
+			/*Point3D v1, v2, res;
+			v1.x = b.x - a.x;
+			v1.y = b.y - a.y;
+			v1.z = b.z - a.z;
+
+			v2.x = c.x - a.x;
+			v2.y = c.y - a.y;
+			v2.z = c.z - a.z;*/
+
+			//produto vetorial:
+			/*res.x = (v1.y * v2.z) - (v1.z * v2.y);
+			res.y = (v1.z * v2.x) - (v1.x*v2.z);
+			res.z = (v1.x * v2.y) - (v1.y*v2.x);*/
+
+			//normalizando:
+			Point3D a = points[faces[i].p1];
+			Point3D b = points[faces[i].p2];
+			Point3D c = points[faces[i].p3];
+			Point3D normal = (a + b + c) / 3;
+			/*double div = sqrt(res.x*res.x + res.y*res.y + res.z*res.z);
+			res = res / div;*/
+
+			normais.push_back(normal);
+
+			//r1:
+			double aux = normais[i].x*f1[i].x + normais[i].y*f1[i].y + normais[i].z*f1[i].z;
+			Point3D re = (normais[i] * (2 * aux)) - f1[i];
+			
+			//normalizando:
+			double d = sqrt(re.x*re.x + re.y*re.y + re.z*re.z);
+			re = re / d;
+
+			r1.push_back(re);
+
+			//calculate prod:
+			prod.push_back(f1[i].x*normais[i].x + f1[i].y*normais[i].y + f1[i].z*normais[i].z);
+
+			//calculate v:
+			Point3D ba;
+			ba.x = (points[faces[i].p1].x + points[faces[i].p2].x + points[faces[i].p3].x) / 3;
+			ba.y = (points[faces[i].p1].y + points[faces[i].p2].y + points[faces[i].p3].y) / 3;
+			ba.z = (points[faces[i].p1].z + points[faces[i].p2].z + points[faces[i].p3].z) / 3;
+
+			Point3D ve = ba - Point3D(eyeX, eyeY, eyeZ);
+
+			//normaliza:
+			double di = sqrt(ve.x*ve.x + ve.y*ve.y + ve.z*ve.z);
+			ve = ve / di;
+
+			v.push_back(ve);
+		}
+
 	}
 
 private:

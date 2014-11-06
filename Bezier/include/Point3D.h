@@ -71,6 +71,15 @@ public:
 		return (x*a.x + y*a.y + z*a.z);
 	};
 
+	Point3D cross(Point3D a){
+		Point3D retorno = Point3D();
+		retorno.x = -(*this).y*a.z + (*this).z*a.y;
+		retorno.y = -(*this).z*a.x + (*this).x*a.z;
+		retorno.z = -(*this).x*a.y + (*this).y*a.x;
+
+		return retorno.normalized();
+	};
+
 	Point3D normalized(){
 		return ((*this) / module());
 	};

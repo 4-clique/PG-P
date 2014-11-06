@@ -24,7 +24,6 @@ Referencia online para os comandos OpenGL (Man pages):
 #include <math.h>
 
 using namespace std;
-double mouse_x, mouse_y;
 double window_width = 800.0;
 double window_height = 800.0;
 double zbuffer[800][800];
@@ -32,10 +31,8 @@ vector<Object3D> objects = vector<Object3D>();
 int selected_object = 0;
 int selected_light_source = 0;
 double ia = 1;
-double il = 0.2;
+double il = 0.4;
 double is = 20;
-double eyeX = 0, eyeY = 0, eyeZ = 100;
-bool mod = false;
 vector<LightSource> sources = vector<LightSource>();
 //LightSource source1 = LightSource(0,0,0); // no centro do mundo
 
@@ -71,21 +68,18 @@ void myreshape (GLsizei w, GLsizei h)
 void resetBuffer(){
 	for (int i = 0; i < 800;i++) {
 		for (int j = 0; j < 800;j++) {
-			buffer[i][j] = DBL_MAX;
+			zbuffer[i][j] = DBL_MAX;
 		}
 	}
 }
 
 void drawObjects(){
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	
 
 	for (int j = 0; j < objects.size(); j++) {
-		if (mod) {
-			objects[j].recalculate(sources[0].location, eyeX, eyeY, eyeZ);
-			mod = false;
-		}
 		glPushMatrix();
 		glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
 		//glRotatef(objects[j].angleX, 1, 0, 0);
@@ -94,23 +88,28 @@ void drawObjects(){
 		glScaled(objects[j].scale, objects[j].scale, objects[j].scale);
 
 		for (int i = 0; i < objects[j].faces.size(); i++) {
-			bool front = decide(objects[j].normais[i]);
-			if (front) {
-				double a = ia*objects[j].ka*objects[j].r;
-				double b = ia*objects[j].ka*objects[j].g;
-				double c = ia*objects[j].ka*objects[j].b;
-				for (int t = 0; t < sources.size(); t++) {
-					a += il*objects[j].kd*objects[j].prod[i] * sources[t].r + (il*is*objects[j].ks*pow(produtoInterno(objects[j].r1[i], objects[j].v[i]), objects[j].q)*sources[t].r) / 255;
-					b += il*objects[j].kd*objects[j].prod[i] * sources[t].g + (il*is*objects[j].ks*pow(produtoInterno(objects[j].r1[i], objects[j].v[i]), objects[j].q)*sources[t].g) / 255;
-					c += il*objects[j].kd*objects[j].prod[i] * sources[t].b + (il*is*objects[j].ks*pow(produtoInterno(objects[j].r1[i], objects[j].v[i]), objects[j].q)*sources[t].b) / 255;
+			double a = ia*objects[j].ka*objects[j].r;
+			double b = ia*objects[j].ka*objects[j].g;
+			double c = ia*objects[j].ka*objects[j].b;
+			for (int t = 0; t < sources.size(); t++) {
+				Point3D direcaoNormal = objects[j].normais[i] - objects[j].bariCenter;
+				direcaoNormal = direcaoNormal.normalized();
+				Point3D direcaoF = sources[t].location - objects[j].normais[i];
+				direcaoF = direcaoF.normalized();
+
+				if (direcaoF.dot(direcaoNormal) > 0){
+					//cout << direcaoF.dot(direcaoNormal) << endl;
+					a += il*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].r;// +(il*is*objects[j].ks*pow(objects[j].r1[i].dot(objects[j].v[i]), objects[j].q)*sources[t].r) / 255;
+					b += il*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].g;//  + (il*is*objects[j].ks*pow(objects[j].r1[i].dot(objects[j].v[i]), objects[j].q)*sources[t].g) / 255;
+					c += il*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].b;//  + (il*is*objects[j].ks*pow(objects[j].r1[i].dot(objects[j].v[i]), objects[j].q)*sources[t].b) / 255;
 				}
-				glColor3f(a, b, c);//aux.x, aux.y, aux.z
-				glBegin(GL_TRIANGLES);
-				glVertex3f(objects[j].points[objects[j].faces[i].p1].x, objects[j].points[objects[j].faces[i].p1].y, objects[j].points[objects[j].faces[i].p1].z);
-				glVertex3f(objects[j].points[objects[j].faces[i].p2].x, objects[j].points[objects[j].faces[i].p2].y, objects[j].points[objects[j].faces[i].p2].z);
-				glVertex3f(objects[j].points[objects[j].faces[i].p3].x, objects[j].points[objects[j].faces[i].p3].y, objects[j].points[objects[j].faces[i].p3].z);
-				glEnd();
 			}
+			glColor3f(a, b, c);//aux.x, aux.y, aux.z
+			glBegin(GL_TRIANGLES);
+			glVertex3f(objects[j].points[objects[j].faces[i].p1].x, objects[j].points[objects[j].faces[i].p1].y, objects[j].points[objects[j].faces[i].p1].z);
+			glVertex3f(objects[j].points[objects[j].faces[i].p2].x, objects[j].points[objects[j].faces[i].p2].y, objects[j].points[objects[j].faces[i].p2].z);
+			glVertex3f(objects[j].points[objects[j].faces[i].p3].x, objects[j].points[objects[j].faces[i].p3].y, objects[j].points[objects[j].faces[i].p3].z);
+			glEnd();
 			
 		}
 		glPopMatrix();
@@ -130,17 +129,6 @@ void mydisplay()
 	double size = 0.5;
 
 	drawObjects();
-
-	glPushMatrix();
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glColor3f(0.25, 0.75, 0);
-	glBegin(GL_QUADS);
-	glVertex3f(-10, -5,10);
-	glVertex3f(10, -5, 10);
-	glVertex3f(10, -5, -10);
-	glVertex3f(-10, -5, -10);
-	glEnd();
-	glPopMatrix();
 
 	glFlush();
 	glutPostRedisplay();
@@ -166,7 +154,6 @@ void handleMouse(int btn, int state, int x, int y)
 
 void hadleKeyboard(unsigned char key, int x, int y)
 {
-	mod = true;
 	if(key == ESC){
 		exit(0);
 	}
@@ -209,14 +196,6 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key == ',') {
 		selected_object = (selected_object - 1) % objects.size();
 	}
-<<<<<<< HEAD
-
-	if (key == 'q'){
-		camera.RotateMatrix(90, 'y');
-		/*cout << ((camera.directionX-camera.center).dot((camera.directionZ-camera.center)) /
-			((camera.directionX - camera.center).module()*(camera.directionZ - camera.center).module())) << endl;*/
-	}
-
 	if (key == 'a'){
 		Point3D deslocamento = (camera.directionX - camera.center)*-MOVE_CAMERA;
 		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
@@ -234,11 +213,10 @@ void hadleKeyboard(unsigned char key, int x, int y)
 		Point3D deslocamento = (camera.directionZ - camera.center)*-MOVE_CAMERA;
 		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
 	}
-=======
-	if (key == 'q'){
+	if (key == 'p'){
 
 	}
-	if (key == 'w') {
+	if (key == 'l') {
 
 	}
 	if (key=='e') {
@@ -262,10 +240,9 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	/*for (int i = 0; i < objects.size();i++){
 		objects[i].recalculate(source1.location, eyeX, eyeY, eyeZ);
 	}*/
->>>>>>> origin/cb
 }
 
-void handleSpecialKeyboard(int key, int x, int y)
+void hadleSpecialKeyboard(int key, int x, int y)
 {
 }
 
@@ -282,22 +259,23 @@ int main(int argc, char **argv){
 	source1.setColor(1, 0, 0);
 	//sources.push_back(source2);
 
-	//setando objeto 0:
-	objects.push_back(readObject("pumpkin.obj"));
+	objects.push_back(readObject("dog.obj"));
 	objects[0].selectka(0.6);
 	objects[0].selectkd(0.5);
 	objects[0].selectks(0.1);
 	objects[0].selectq(1);
-	objects[0].selectColor(1, 0.54902, 0);
-	objects[0].recalculate(source1.location, eyeX, eyeY, eyeZ);
-	//setando objeto 1:
-	objects.push_back(readObject("dog.obj"));
+	objects[0].selectColor(0.7, 0.5, 0);
+	objects[0].recalculate(source1.location, camera.center.x, camera.center.y, camera.center.z);
+	//setando objeto 0:
+	objects.push_back(readObject("pumpkin.obj"));
 	objects[1].selectka(0.6);
 	objects[1].selectkd(0.5);
 	objects[1].selectks(0.1);
 	objects[1].selectq(1);
-	objects[1].selectColor(0.7, 0.5, 0);
-	objects[1].recalculate(source1.location, eyeX, eyeY, eyeZ);
+	objects[1].selectColor(1, 0.54902, 0);
+	objects[1].recalculate(source1.location, camera.center.x, camera.center.y, camera.center.z);
+	//setando objeto 1:
+	
 	//setando objeto 2:
 	/*objects.push_back(readObject("teste.obj"));
 	objects[2].selectka(0.6);
@@ -316,7 +294,7 @@ int main(int argc, char **argv){
 	glutDisplayFunc(mydisplay);
 	glutReshapeFunc(myreshape);
 	glutIdleFunc(mydisplay);
-	glutSpecialFunc(handleSpecialKeyboard);
+	glutSpecialFunc(hadleSpecialKeyboard);
 	glutMouseFunc(handleMouse);
 	glutMotionFunc(handleMotion);
 	glutKeyboardFunc(hadleKeyboard);
