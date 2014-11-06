@@ -2,47 +2,106 @@
 #define __CAMERA_H__
 
 #include <Point3D.h>
-
+#include <math.h>;
 class Camera
 {
 public:
 	Point3D center;
-	Point3D direction;
-	Point3D way;
+	Point3D directionX;
+	Point3D directionY;
+	Point3D directionZ;
 	Camera(){};
-	Camera(double a, double b, double c){
-		center = Point3D(a, b, c);
-		direction = Point3D(0, 0, 0);
-		way = Point3D(0, 1, 0); //Direcao default
+	Camera(Point3D c, Point3D xAxes, Point3D yAxes, Point3D zAxes){
+		center = c;
+		directionX = xAxes;
+		directionY = yAxes;
+		directionZ = zAxes;
+	};
+
+	void loadCamera(){
+		Point3D xCamera = directionX-center;
+		xCamera = xCamera.normalized();
+		Point3D yCamera = directionY-center;
+		yCamera = yCamera.normalized();
+		Point3D zCamera = center-directionZ;
+		zCamera = zCamera.normalized();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		GLfloat extrinsic1[16] = {
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			-center.x, -center.y, -center.z, 1
+		};
+		GLfloat extrinsic2[16] = {
+			xCamera.x, yCamera.x, zCamera.x, 0,
+			xCamera.y, yCamera.y, zCamera.y, 0,
+			xCamera.z, yCamera.z, zCamera.z, 0,
+			0, 0, 0, 1
+		}; 
+		
+		glMultMatrixf(extrinsic2);
+		glMultMatrixf(extrinsic1);
+		
+		/*glPushMatrix();
+		glColor3f(1, 0, 0);
+		glPointSize(10);
+		glBegin(GL_POINTS);
+		glVertex3f(directionX.x, directionX.y, directionX.z);
+		glVertex3f(directionY.x, directionY.y, directionY.z);
+		glVertex3f(directionZ.x, directionZ.y, directionZ.z);
+		glEnd();
+		glPopMatrix();*/
+		
 	};
 
 	void translate(double transX, double transY, double transZ){
-		Point3D c = center;
-		if (transZ != 0) {			
-			center.x += (direction.x - c.x) / transZ;
-			direction.x += (direction.x - c.x) / transZ;
-			center.y += (direction.y - c.y) / transZ;
-			direction.y += (direction.y - c.y) / transZ;
-			center.z += (direction.z - c.z) / transZ;
-			direction.z += (direction.z - c.z) / transZ;
-		}
-		if (transX != 0){
-			
-			RotateMatrix(90, 'y');
-			center.x += (direction.x - c.x) / transX;
-			direction.x += (direction.x - c.x) / transX;
-			center.y += (direction.y - c.y) / transX;
-			direction.y += (direction.y - c.y) / transX;
-			center.z += (direction.z - c.z) / transX;
-			direction.z += (direction.z - c.z) / transX;
-			RotateMatrix(-90, 'y');
-		}
-		
-		
+		center.x += transX;
+		directionX.x += transX;
+		directionY.x += transX;
+		directionZ.x += transX;
+		center.y += transY;
+		directionX.y += transY;
+		directionY.y += transY;
+		directionZ.y += transY;
+		center.z += transZ;
+		directionX.z += transZ;
+		directionY.z += transZ;
+		directionZ.z += transZ;
 	};
 
 	void RotateMatrix(double degrees, char axis){
-		Point3D c = Point3D(center.x, center.y, center.z);
+		Point3D c = center;
+		translate(-c.x, -c.y, -c.z);
+		if (axis == 'y'){
+			double dxX = directionX.x;
+			double dxZ = directionX.z;
+			directionX.x = cos((acos(-1.0)*degrees)/180.0)*dxX + sin((acos(-1.0)*degrees)/180.0)* dxZ;
+			directionX.z = cos((acos(-1.0)*degrees)/180.0)*dxZ - sin((acos(-1.0)*degrees)/180.0)* dxX;
+
+			directionZ.x = - directionX.y*directionY.z + directionX.z*directionY.y;
+			directionZ.y = - directionX.z*directionY.x + directionX.x*directionY.z;
+			directionZ.z = - directionX.x*directionY.y + directionX.y*directionY.x;
+		}
+		if (axis == 'x'){
+			double dyY = directionY.y;
+			double dyZ = directionY.z;
+			directionY.y = cos((acos(-1.0)*degrees)/180.0)*dyY - sin((acos(-1.0)*degrees)/180.0) *dyZ;
+			directionY.z = sin((acos(-1.0)*degrees)/180.0)*dyY + cos((acos(-1.0)*degrees)/180.0)*dyZ;
+
+			directionZ.x = -directionX.y*directionY.z + directionX.z*directionY.y;
+			directionZ.y = -directionX.z*directionY.x + directionX.x*directionY.z;
+			directionZ.z = -directionX.x*directionY.y + directionX.y*directionY.x;
+		}
+		directionX = directionX.normalized();
+		directionY = directionY.normalized();
+		directionZ = directionZ.normalized();
+		/*cout << directionX.x << " " << directionX.y << " " << directionX.z << endl;
+		cout << directionZ.x << " " << directionZ.y << " " << directionZ.z << endl;*/
+		translate(c.x, c.y, c.z);
+		//translate(-center.x, -center.y, -center.z);
+		//translate(c.x, c.y, c.z);
+		/*Point3D c = Point3D(center.x, center.y, center.z);
 		center.x -= c.x;
 		direction.x -= c.x;
 		center.y -= c.y;
@@ -52,21 +111,21 @@ public:
 		if (axis == 'x'){
 			double y = direction.y;
 			double z = direction.z;
-			direction.y = cos((PI*degrees) / 180)*y - sin((PI*degrees) / 180) * z;
-			direction.z = sin((PI*degrees) / 180)*y + cos((PI*degrees) / 180)*z;
+			direction.y = cos((acos(-1.0)*degrees) / 180.0)*y - sin((acos(-1.0)*degrees) / 180.0) * z;
+			direction.z = sin((acos(-1.0)*degrees) / 180.0)*y + cos((acos(-1.0)*degrees) / 180.0)*z;
 		}
 		else if (axis == 'y') {
 			double x = direction.x;
 			double z = direction.z;
-			direction.x = cos((PI*degrees) / 180)*x + sin((PI*degrees) / 180) * z;
-			direction.z = cos((PI*degrees) / 180)*z - sin((PI*degrees) / 180)*x;
+			direction.x = cos((acos(-1.0)*degrees) / 180.0)*x + sin((acos(-1.0)*degrees) / 180.0) * z;
+			direction.z = cos((acos(-1.0)*degrees) / 180.0)*z - sin((acos(-1.0)*degrees) / 180.0)*x;
 		}
 		center.x += c.x;
 		direction.x += c.x;
 		center.y += c.y;
 		direction.y += c.y;
 		center.z += c.z;
-		direction.z += c.z;
+		direction.z += c.z;*/
 	};
 
 private:

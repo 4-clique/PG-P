@@ -17,11 +17,11 @@
 #include <set>
 const double TRANS_SCALA = 1;
 const double ROTAT_SCALA = 4;
-const double MOVE_CAMERA = 10;
-const double ROTAT_CAMERA = 50;
+const double MOVE_CAMERA = 1;
+const double ROTAT_CAMERA = 10;
 const double CAMERAX_INICIAL = 0;
 const double CAMERAY_INICIAL = 0;
-const double CAMERAZ_INICIAL = 10;
+const double CAMERAZ_INICIAL = 20;
 
 Object3D readObject(string arquivo){
 	ifstream ifs(arquivo, ifstream::in);
@@ -46,7 +46,9 @@ Object3D readObject(string arquivo){
 		}
 	}
 	return Object3D(point_vector, face_vector, bariCenter/point_vector.size());
-}
+};
+
+
 
 //double X2NDC(double x, double width){ return (((x * 2) / width) - 1); }
 //double Y2NDC(double y, double height){ return ((y * (-2)) / height) + 1; }

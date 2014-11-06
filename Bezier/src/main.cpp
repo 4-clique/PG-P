@@ -32,7 +32,13 @@ int selected_object = 0;
 double ia = 1;
 
 //Propriedades da Camera
-Camera camera = Camera(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL);
+Camera camera = Camera(
+	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL),
+	Point3D(CAMERAX_INICIAL+1, CAMERAY_INICIAL, CAMERAZ_INICIAL),
+	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL+1, CAMERAZ_INICIAL),
+	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL-1)
+	);
+
 
 //Movimento do mouse;
 int mouseInicialX = 0;
@@ -50,8 +56,8 @@ void myreshape (GLsizei w, GLsizei h)
 	glViewport(0, 0, w, h);
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
-	gluPerspective(45, ratio, 0, 3000);
-	glMatrixMode(GL_MODELVIEW);
+	gluPerspective(30, ratio, 0, 3000);
+	
 }
 
 void mydisplay(void)
@@ -59,21 +65,24 @@ void mydisplay(void)
 
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glLoadIdentity(); //Substitui matrizes pela identidade (sem isso a câmera não funciona bem)
 	
+
 	//Look At Point = Line Of Sight + Camera Position >> em gluLookAt, os parâmetros centerX e centerZ são baseados nessa equação
-	gluLookAt(camera.center.x, camera.center.y, camera.center.z, 
+	/*gluLookAt(camera.center.x, camera.center.y, camera.center.z, 
 		camera.direction.x, camera.direction.y, camera.direction.z,
-		camera.way.x, camera.way.y, camera.way.z);
+		camera.way.x, camera.way.y, camera.way.z);*/
 	
-
+	
+	camera.loadCamera();
 
 	double x = 0;
 	double y = 0;
 	double size = 0.5;
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	
+	
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	for (int j = 0; j < objects.size();j++) {
 		//if(j == selected_object) glColor3f(1, 0.54902, 0);
@@ -102,10 +111,10 @@ void mydisplay(void)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glColor3f(0.25, 0.75, 0);
 	glBegin(GL_QUADS);
-	glVertex3f(-250,-100,250);
-	glVertex3f(250, -100, 250);
-	glVertex3f(250, -100, -250);
-	glVertex3f(-250, -100, -250);
+	glVertex3f(-10, -5,10);
+	glVertex3f(10, -5, 10);
+	glVertex3f(10, -5, -10);
+	glVertex3f(-10, -5, -10);
 	glEnd();
 	glPopMatrix();
 
@@ -117,6 +126,10 @@ void handleMotion(int x, int y)
 {
 	camera.RotateMatrix((x - mouseInicialX)/ROTAT_CAMERA, 'y');
 	camera.RotateMatrix((y - mouseInicialY) / ROTAT_CAMERA, 'x');
+	mouseInicialX = x;
+	mouseInicialY = y;
+	/*cout << ((camera.directionX - camera.center).dot((camera.directionZ - camera.center)) /
+		((camera.directionX - camera.center).module()*(camera.directionZ - camera.center).module())) << endl;*/
 }
 
 void handleMouse(int btn, int state, int x, int y)
@@ -172,20 +185,28 @@ void hadleKeyboard(unsigned char key, int x, int y)
 		selected_object = (selected_object - 1) % objects.size();
 	}
 
-	if (key == 'a'){
-		camera.translate(MOVE_CAMERA, 0, 0);
-	}
-	if (key == 'd'){
-		camera.translate(-MOVE_CAMERA, 0, 0);
+	if (key == 'q'){
+		camera.RotateMatrix(90, 'y');
+		/*cout << ((camera.directionX-camera.center).dot((camera.directionZ-camera.center)) /
+			((camera.directionX - camera.center).module()*(camera.directionZ - camera.center).module())) << endl;*/
 	}
 
-	if (key == 'w'){ //aproximação da câmera
-		camera.translate(0, 0, MOVE_CAMERA);
-		//camera.translate(0, 0, -((camera.center.z - camera.direction.z) / abs(camera.center.z - camera.direction.z))*MOVE_CAMERA);
+	if (key == 'a'){
+		Point3D deslocamento = (camera.directionX - camera.center)*-MOVE_CAMERA;
+		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
 	}
-	if (key == 's'){ //afastamento da câmera
-		camera.translate(0, 0, -MOVE_CAMERA);
-		//camera.translate(0, 0, ((camera.center.z - camera.direction.z) / abs(camera.center.z - camera.direction.z))*MOVE_CAMERA);
+	if (key == 'd'){
+		Point3D deslocamento = (camera.directionX - camera.center)*MOVE_CAMERA;
+		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+	}
+
+	if (key == 'w'){
+		Point3D deslocamento = (camera.directionZ - camera.center)*MOVE_CAMERA;
+		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+	}
+	if (key == 's'){
+		Point3D deslocamento = (camera.directionZ - camera.center)*-MOVE_CAMERA;
+		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
 	}
 }
 
