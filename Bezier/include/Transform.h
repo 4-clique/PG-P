@@ -15,6 +15,9 @@
 #include <bitset>
 #include <stack>
 #include <set>
+#include <LightSource.h>
+#include <float.h>
+#include <limits.h>
 const double TRANS_SCALA = 1;
 const double ROTAT_SCALA = 4;
 const double MOVE_CAMERA = 1;
