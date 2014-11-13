@@ -24,13 +24,10 @@ public:
 	vector<Point3D> points;
 	vector<Face3D> faces;
 	vector<Point3D> normais;
-	vector<Point3D> f1; // para fonte de luz 1
-	vector<Point3D> r1; // guarda as reflexoes de f1
+	vector<Point3D> reflexaoLuz; // guarda as reflexoes da luz
 	vector<Point3D> v; //guarda os v - que apontam para o observador
-	vector<double> prod; //produto interno
+	vector<Point3D> texturesPoints;
 	Point3D bariCenter;
-	double altX = 0, altY = 0, altZ = 0;
-	double angleX = 0, angleY = 0, angleZ = 0;
 	double scale = 1;
 	double ka, kd, ks; //ka é coeficiente de reflexao ambiente, kb é coeficiente de reflexao difusa, ks é de especular
 	double q; //para calculo da especular
@@ -40,13 +37,18 @@ public:
 		points = vector<Point3D>();
 		faces = vector<Face3D>();
 		normais = vector<Point3D>();
-		f1 = vector<Point3D>();
-		prod = vector<double>();
 	}
 
 	Object3D(vector<Point3D> p, vector<Face3D> f, Point3D b) {
 		points = p;
 		faces = f;
+		bariCenter = b;
+	}
+
+	Object3D(vector<Point3D> p, vector<Face3D> f, vector<Point3D> t, Point3D b) {
+		points = p;
+		faces = f;
+		texturesPoints = t;
 		bariCenter = b;
 	}
 
@@ -58,9 +60,11 @@ public:
 		faces.push_back(Face3D(a, b, c));
 	}
 
-	void calculateProd(){
-		for (int i = 0; i < faces.size(); i++){
-			prod.push_back(f1[i].x*normais[i].x + f1[i].y*normais[i].y + f1[i].z*normais[i].z);
+	void translate(double transX, double transY, double transZ){
+		for (int i = 0; i < points.size(); i++){
+			points[i].x += transX;
+			points[i].y += transY;
+			points[i].z += transZ;
 		}
 	}
 
@@ -115,73 +119,26 @@ public:
 		b = c3;
 	}
 
-	void recalculate(Point3D fonte, double eyeX, double eyeY, double eyeZ){
-		for (int i = 0; i < faces.size(); i++) {
-			//f1:
-			Point3D barr;
-			barr.x = (points[faces[i].p1].x + points[faces[i].p2].x + points[faces[i].p3].x) / 3;
-			barr.y = (points[faces[i].p1].y + points[faces[i].p2].y + points[faces[i].p3].y) / 3;
-			barr.z = (points[faces[i].p1].z + points[faces[i].p2].z + points[faces[i].p3].z) / 3;
+	void recalculate(Point3D fonte, Point3D cameraCenter){
+		normais.clear();
+		reflexaoLuz.clear();
+		v.clear();
+		for (int i = 0; i < faces.size(); i++) {		
+			//Normais:
+			Point3D v1 = (points[faces[i].p2] - points[faces[i].p3]).normalized();
+			Point3D v2 = (points[faces[i].p1] - points[faces[i].p3]).normalized();
+			Point3D normal = v1.cross(v2);
+			normais.push_back(normal.normalized());
 
-			Point3D verr = barr - fonte;
+			//reflexaoLuz:
+			Point3D N = normais[i];
+			Point3D L = (fonte - points[faces[i].p1]).normalized();
+			Point3D R = N * 2 * (N.dot(L)) - L;
+			reflexaoLuz.push_back(R.normalized());
 
-			//normaliza:
-			double divi = sqrt(verr.x*verr.x + verr.y*verr.y + verr.z*verr.z);
-			verr = verr / divi;
-
-			f1.push_back(verr);
-			
-			//normal:
-			/*Point3D v1, v2, res;
-			v1.x = b.x - a.x;
-			v1.y = b.y - a.y;
-			v1.z = b.z - a.z;
-
-			v2.x = c.x - a.x;
-			v2.y = c.y - a.y;
-			v2.z = c.z - a.z;*/
-
-			//produto vetorial:
-			/*res.x = (v1.y * v2.z) - (v1.z * v2.y);
-			res.y = (v1.z * v2.x) - (v1.x*v2.z);
-			res.z = (v1.x * v2.y) - (v1.y*v2.x);*/
-
-			//normalizando:
-			Point3D a = points[faces[i].p1];
-			Point3D b = points[faces[i].p2];
-			Point3D c = points[faces[i].p3];
-			Point3D normal = (a + b + c) / 3;
-			/*double div = sqrt(res.x*res.x + res.y*res.y + res.z*res.z);
-			res = res / div;*/
-
-			normais.push_back(normal);
-
-			//r1:
-			double aux = normais[i].x*f1[i].x + normais[i].y*f1[i].y + normais[i].z*f1[i].z;
-			Point3D re = (normais[i] * (2 * aux)) - f1[i];
-			
-			//normalizando:
-			double d = sqrt(re.x*re.x + re.y*re.y + re.z*re.z);
-			re = re / d;
-
-			r1.push_back(re);
-
-			//calculate prod:
-			prod.push_back(f1[i].x*normais[i].x + f1[i].y*normais[i].y + f1[i].z*normais[i].z);
-
-			//calculate v:
-			Point3D ba;
-			ba.x = (points[faces[i].p1].x + points[faces[i].p2].x + points[faces[i].p3].x) / 3;
-			ba.y = (points[faces[i].p1].y + points[faces[i].p2].y + points[faces[i].p3].y) / 3;
-			ba.z = (points[faces[i].p1].z + points[faces[i].p2].z + points[faces[i].p3].z) / 3;
-
-			Point3D ve = ba - Point3D(eyeX, eyeY, eyeZ);
-
-			//normaliza:
-			double di = sqrt(ve.x*ve.x + ve.y*ve.y + ve.z*ve.z);
-			ve = ve / di;
-
-			v.push_back(ve);
+			//V:
+			Point3D v_1 = (cameraCenter - points[faces[i].p1]).normalized();
+			v.push_back(v_1.normalized());
 		}
 
 	}

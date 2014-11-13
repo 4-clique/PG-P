@@ -24,15 +24,16 @@ Referencia online para os comandos OpenGL (Man pages):
 #include <math.h>
 
 using namespace std;
-double window_width = 800.0;
-double window_height = 800.0;
-double zbuffer[800][800];
+double window_width = 1080.0;
+double window_height = 1920.0;
 vector<Object3D> objects = vector<Object3D>();
 int selected_object = 0;
 int selected_light_source = 0;
-double ia = 1;
-double il = 0.4;
-double is = 20;
+int togle = -1;
+double ia = 0.5;
+double id = 0.4;
+double is = 0.25;
+int t = 1;
 vector<LightSource> sources = vector<LightSource>();
 //LightSource source1 = LightSource(0,0,0); // no centro do mundo
 
@@ -61,16 +62,9 @@ void myreshape (GLsizei w, GLsizei h)
 	glViewport(0, 0, w, h);
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
-	gluPerspective(30, ratio, 0, 3000);
-	
-}
-
-void resetBuffer(){
-	for (int i = 0; i < 800;i++) {
-		for (int j = 0; j < 800;j++) {
-			zbuffer[i][j] = DBL_MAX;
-		}
-	}
+	gluPerspective(30, ratio, 1, 3000);
+	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
+	glDepthFunc(GL_LESS);
 }
 
 void drawObjects(){
@@ -81,30 +75,41 @@ void drawObjects(){
 
 	for (int j = 0; j < objects.size(); j++) {
 		glPushMatrix();
-		glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
+		//glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
 		//glRotatef(objects[j].angleX, 1, 0, 0);
-		glRotatef(objects[j].angleY, 0, 1, 0);
-		glRotatef(objects[j].angleZ, 0, 0, 1);
 		glScaled(objects[j].scale, objects[j].scale, objects[j].scale);
 
 		for (int i = 0; i < objects[j].faces.size(); i++) {
-			double a = ia*objects[j].ka*objects[j].r;
-			double b = ia*objects[j].ka*objects[j].g;
-			double c = ia*objects[j].ka*objects[j].b;
+			double r = 0;
+			double g = 0;
+			double b = 0;
 			for (int t = 0; t < sources.size(); t++) {
-				Point3D direcaoNormal = objects[j].normais[i] - objects[j].bariCenter;
-				direcaoNormal = direcaoNormal.normalized();
-				Point3D direcaoF = sources[t].location - objects[j].normais[i];
+				r += ia*objects[j].ka*sources[t].r;
+				g += ia*objects[j].ka*sources[t].g;
+				b += ia*objects[j].ka*sources[t].b;
+				Point3D direcaoNormal = objects[j].normais[i];
+				Point3D direcaoF = sources[t].location - objects[j].faces[i].p1;
 				direcaoF = direcaoF.normalized();
+					//r += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].r;
+					//g += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].g;
+					//b += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].b;
+				/*	r += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
+					g += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
+					b += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));*/
 
 				if (direcaoF.dot(direcaoNormal) > 0){
 					//cout << direcaoF.dot(direcaoNormal) << endl;
-					a += il*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].r;// +(il*is*objects[j].ks*pow(objects[j].r1[i].dot(objects[j].v[i]), objects[j].q)*sources[t].r) / 255;
-					b += il*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].g;//  + (il*is*objects[j].ks*pow(objects[j].r1[i].dot(objects[j].v[i]), objects[j].q)*sources[t].g) / 255;
-					c += il*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].b;//  + (il*is*objects[j].ks*pow(objects[j].r1[i].dot(objects[j].v[i]), objects[j].q)*sources[t].b) / 255;
+					r += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].r;
+					g += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].g;
+					b += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].b;
+				}
+				if (objects[j].reflexaoLuz[i].dot(objects[j].v[i]) > 0){
+					r += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
+					g += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
+					b += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
 				}
 			}
-			glColor3f(a, b, c);//aux.x, aux.y, aux.z
+			glColor3f(r*objects[j].r, g*objects[j].g, b*objects[j].b);//aux.x, aux.y, aux.z
 			glBegin(GL_TRIANGLES);
 			glVertex3f(objects[j].points[objects[j].faces[i].p1].x, objects[j].points[objects[j].faces[i].p1].y, objects[j].points[objects[j].faces[i].p1].z);
 			glVertex3f(objects[j].points[objects[j].faces[i].p2].x, objects[j].points[objects[j].faces[i].p2].y, objects[j].points[objects[j].faces[i].p2].z);
@@ -119,9 +124,11 @@ void drawObjects(){
 void mydisplay()
 {
 
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
+	//glClearColor(0, 0, 0, 0);
+	glClearDepth(1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+
 	camera.loadCamera();
 	
 	double x = 0;
@@ -140,6 +147,9 @@ void handleMotion(int x, int y)
 	camera.RotateMatrix((y - mouseInicialY) / ROTAT_CAMERA, 'x');
 	mouseInicialX = x;
 	mouseInicialY = y;
+	for (int i = 0; i < sources.size(); i++){
+		objects[selected_object].recalculate(sources[i].location, camera.center);
+	}
 	/*cout << ((camera.directionX - camera.center).dot((camera.directionZ - camera.center)) /
 		((camera.directionX - camera.center).module()*(camera.directionZ - camera.center).module())) << endl;*/
 }
@@ -158,31 +168,58 @@ void hadleKeyboard(unsigned char key, int x, int y)
 		exit(0);
 	}
 	if (key == '1'){
-		objects[selected_object].altX -= TRANS_SCALA;
+		objects[selected_object].translate(-TRANS_SCALA, 0, 0);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}		
 	}
 	if (key == '2'){
-		objects[selected_object].altX += TRANS_SCALA;
+		objects[selected_object].translate(TRANS_SCALA, 0, 0);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '3'){
-		objects[selected_object].altY -= TRANS_SCALA;
+		objects[selected_object].translate(0, -TRANS_SCALA, 0);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '4'){
-		objects[selected_object].altY += TRANS_SCALA;
+		objects[selected_object].translate(0, TRANS_SCALA, 0);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '5'){
-		objects[selected_object].altZ -= TRANS_SCALA;
+		objects[selected_object].translate(0, 0, -TRANS_SCALA);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '6'){
-		objects[selected_object].altZ += TRANS_SCALA;
+		objects[selected_object].translate(0, 0, TRANS_SCALA);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '7'){
 		objects[selected_object].RotateMatrix(1, 'x');
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '8'){
 		objects[selected_object].RotateMatrix(1, 'y');
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '9'){
 		objects[selected_object].RotateMatrix(1, 'z');
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '='){
 		objects[selected_object].scale = 1.01*objects[selected_object].scale;
@@ -199,25 +236,51 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key == 'a'){
 		Point3D deslocamento = (camera.directionX - camera.center)*-MOVE_CAMERA;
 		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == 'd'){
 		Point3D deslocamento = (camera.directionX - camera.center)*MOVE_CAMERA;
 		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 
 	if (key == 'w'){
 		Point3D deslocamento = (camera.directionZ - camera.center)*MOVE_CAMERA;
 		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == 's'){
 		Point3D deslocamento = (camera.directionZ - camera.center)*-MOVE_CAMERA;
 		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
-	if (key == 'p'){
-
+	if (key == 'f'){
+		Point3D cameraDirection = (camera.directionZ - camera.center).normalized();
+		Point3D objectDirection = (objects[selected_object].bariCenter - camera.center).normalized();
+		/*cout << cameraDirection.dot(objectDirection) << endl;
+		cout << acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1) << endl;*/
+		cout << cameraDirection.x - objectDirection.x << endl;
+		if (cameraDirection.x - objectDirection.x <= -0.1){
+			if ((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)) > 1.02) camera.RotateMatrix(-(acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)), 'y');
+		}
+		else if (cameraDirection.x - objectDirection.x >= 0.1){
+			if ((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)) > 1.02) camera.RotateMatrix((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)), 'y');
+		}
 	}
 	if (key == 'l') {
-
+		sources[selected_light_source].location.z *= togle;
+		for (int i = 0; i < objects.size(); i++){
+			objects[i].recalculate(sources[selected_light_source].location, camera.center);
+		}
+		cout << sources[selected_light_source].location.z << endl;
 	}
 	if (key=='e') {
 
@@ -226,7 +289,9 @@ void hadleKeyboard(unsigned char key, int x, int y)
 
 	}
 	if (key=='t') {
-
+		t++;
+		objects[selected_object].selectq(t);
+		cout << t << endl;
 	}
 	if (key=='y'){
 
@@ -247,50 +312,58 @@ void hadleSpecialKeyboard(int key, int x, int y)
 }
 
 int main(int argc, char **argv){
-	resetBuffer();
 
 	//fonte de luz 1:
-	LightSource source1 = LightSource(0, 0, 0);
+	LightSource source1 = LightSource(0, 0 , 1000);
 	source1.setColor(1, 1, 1);
 	sources.push_back(source1);
 
 	//fonte de luz 2:
-	LightSource source2 = LightSource(2000, 2000, 2000);
-	source1.setColor(1, 0, 0);
+	LightSource source2 = LightSource(0, 0, 11);
+	source2.setColor(0, 0, 1);
 	//sources.push_back(source2);
 
-	objects.push_back(readObject("dog.obj"));
+	//setando objeto 0:
+	/*objects.push_back(readObject("pumpkin.obj"));
+	objects[0].selectka(0.3);
+	objects[0].selectkd(0.45);
+	objects[0].selectks(1);
+	objects[0].selectq(10);
+	objects[0].selectColor(0.8, 0.4, 0);
+	objects[0].recalculate(source1.location, camera.center);*/
+	//setando objeto 1:
+	/*objects.push_back(readObject("dog.obj"));
 	objects[0].selectka(0.6);
 	objects[0].selectkd(0.5);
-	objects[0].selectks(0.1);
+	objects[0].selectks(0.55);
 	objects[0].selectq(1);
-	objects[0].selectColor(0.7, 0.5, 0);
-	objects[0].recalculate(source1.location, camera.center.x, camera.center.y, camera.center.z);
-	//setando objeto 0:
-	objects.push_back(readObject("pumpkin.obj"));
-	objects[1].selectka(0.6);
-	objects[1].selectkd(0.5);
-	objects[1].selectks(0.1);
-	objects[1].selectq(1);
-	objects[1].selectColor(1, 0.54902, 0);
-	objects[1].recalculate(source1.location, camera.center.x, camera.center.y, camera.center.z);
-	//setando objeto 1:
+	objects[0].selectColor(1, 1, 1);
+	objects[0].recalculate(source1.location, camera.center);*/
 	
 	//setando objeto 2:
 	/*objects.push_back(readObject("teste.obj"));
-	objects[2].selectka(0.6);
-	objects[2].selectkd(0.5);
-	objects[2].selectks(0.5);
-	objects[2].selectq(1);
-	objects[2].selectColor(1,1,1);
-	objects[2].recalculate(source1.location, eyeX, eyeY, eyeZ);*/
+	objects[1].selectka(0.6);
+	objects[1].selectkd(0.5);
+	objects[1].selectks(0.5);
+	objects[1].selectq(1);
+	objects[1].selectColor(1,1,1);
+	objects[1].recalculate(source1.location, camera.center);*/
 
+	//setando objeto:
+	objects.push_back(readObject("Dog.obj"));
+	objects[0].selectka(0.6);
+	objects[0].selectkd(0.5);
+	objects[0].selectks(0.5);
+	objects[0].selectq(1);
+	objects[0].selectColor(1, 1, 0);
+	objects[0].recalculate(source1.location, camera.center);
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glEnable(GL_DEPTH_TEST);
 	glutInitWindowSize(window_width, window_height);
 	glutCreateWindow("Projeto 1");
+	
 	glutDisplayFunc(mydisplay);
 	glutReshapeFunc(myreshape);
 	glutIdleFunc(mydisplay);
@@ -300,7 +373,6 @@ int main(int argc, char **argv){
 	glutKeyboardFunc(hadleKeyboard);
 	glutSpecialUpFunc(hadleSpecialKeyboard);
 
-	//glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
 	glutMainLoop();
 	return 1;
 
