@@ -35,7 +35,6 @@ double id = 0.4;
 double is = 0.25;
 int t = 1;
 vector<LightSource> sources = vector<LightSource>();
-//LightSource source1 = LightSource(0,0,0); // no centro do mundo
 
 //Propriedades da Camera
 Camera camera = Camera(
@@ -275,36 +274,30 @@ void hadleKeyboard(unsigned char key, int x, int y)
 			if ((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)) > 1.02) camera.RotateMatrix((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)), 'y');
 		}
 	}
-	if (key == 'l') {
-		sources[selected_light_source].location.z *= togle;
-		for (int i = 0; i < objects.size(); i++){
-			objects[i].recalculate(sources[selected_light_source].location, camera.center);
-		}
-		cout << sources[selected_light_source].location.z << endl;
-	}
 	if (key=='e') {
-
+		sources[selected_light_source].location.x -= LIGHT_SCALA;
 	}
 	if (key=='r') {
-
+		sources[selected_light_source].location.x += LIGHT_SCALA;
 	}
 	if (key=='t') {
-		t++;
-		objects[selected_object].selectq(t);
-		cout << t << endl;
+		sources[selected_light_source].location.y -= LIGHT_SCALA;
 	}
 	if (key=='y'){
-
+		sources[selected_light_source].location.y += LIGHT_SCALA;
 	}
-	if (key=='u') {
+	if (key == 'u') {
+		sources[selected_light_source].location.z -= LIGHT_SCALA;
+	}
+	if (key == 'i') {
+		sources[selected_light_source].location.z += LIGHT_SCALA;
+	}
+	if (key=='o') {
 		selected_light_source = (selected_light_source + 1) % sources.size();
 	}
-	if (key =='i') {
+	if (key =='p') {
 		selected_light_source = (selected_light_source - 1) % sources.size();
 	}
-	/*for (int i = 0; i < objects.size();i++){
-		objects[i].recalculate(source1.location, eyeX, eyeY, eyeZ);
-	}*/
 }
 
 void hadleSpecialKeyboard(int key, int x, int y)
