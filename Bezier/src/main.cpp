@@ -38,6 +38,9 @@ double is = 0.25;
 int t = 1;
 vector<LightSource> sources = vector<LightSource>();
 
+double angle = 35;
+double near = 1;
+
 //Propriedades da Camera
 Camera camera = Camera(
 	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL),
@@ -45,8 +48,6 @@ Camera camera = Camera(
 	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL+1, CAMERAZ_INICIAL),
 	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL-1)
 	);
-
-Camera paleta = 
 
 //Movimento do mouse;
 int mouseInicialX = 0;
@@ -59,14 +60,16 @@ void myreshape (GLsizei w, GLsizei h)
 		h = 1;
 	float ratio = w * 1.0 / h; // ratio dá no msm do w/h, só que tem isso de haver o retorno do h como 0, o que causa erro
 
+
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	glLoadIdentity(); 
 	glViewport(0, 0, w, h);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	//glViewport(0, 0, w, h);
 	
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
+<<<<<<< HEAD
 	gluPerspective(30, ratio, 1, 3000);
 	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
 	glDepthFunc(GL_LESS);
@@ -78,6 +81,63 @@ void drawObjects(){
 
 	
 
+=======
+	gluPerspective(angle, window_width / window_height, near, 3000);
+
+	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
+	glDepthFunc(GL_LESS);
+}
+
+void drawPlane(){
+	glColor3f(.3, .3, .3);
+	glBegin(GL_QUADS);
+	glVertex3f(0, -5, 0);
+	glVertex3f(0, -5, 10);
+	glVertex3f(10, -5, 10);
+	glVertex3f(10, -5, 0);
+	glEnd();
+
+	glBegin(GL_LINES);
+	for (int i = 0; i <= 10; i++) {
+		if (i == 0) { glColor3f(.6, .3, .3); }
+		else { glColor3f(.25, .25, .25); };
+		glVertex3f(i, -5, 0);
+		glVertex3f(i, -5, 10);
+		if (i == 0) { glColor3f(.3, .3, .6); }
+		else { glColor3f(.25, .25, .25); };
+		glVertex3f(0, -5, i);
+		glVertex3f(10, -5, i);
+	};
+	glEnd();
+
+	glColor3f(0.5,0,0);
+	glBegin(GL_QUADS);
+	glVertex3f(-120,120,-100);
+	glVertex3f(-120, -120, -100);
+	glVertex3f(120, -120, -100);
+	glVertex3f(120, 120, -100);
+	glEnd();
+	glColor3f(0.5, 0.5, 0);
+	glBegin(GL_QUADS);
+	glVertex3f(-60, 60, -99);
+	glVertex3f(-60, -60, -99);
+	glVertex3f(60, -60, -99);
+	glVertex3f(60, 60, -99);
+	glEnd();
+	glColor3f(0.5, 0.5, 0.5);
+	glBegin(GL_QUADS);
+	glVertex3f(-30, 30, -98);
+	glVertex3f(-30, -30, -98);
+	glVertex3f(30, -30, -98);
+	glVertex3f(30, 30, -98);
+	glEnd();
+}
+
+void drawObjects(){
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+>>>>>>> origin/scc
 	for (int j = 0; j < objects.size(); j++) {
 		glPushMatrix();
 		//glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
@@ -171,7 +231,6 @@ void mydisplay()
 	glViewport(0, 0, window_width, window_height);
 	drawObjects();
 	
-
 	glFlush();
 	glutPostRedisplay();
 }
@@ -343,6 +402,27 @@ void hadleKeyboard(unsigned char key, int x, int y)
 		}
 		
 	}
+	if (key == '[') {
+		if (angle < 64){
+			angle += 0.275;
+			Point3D deslocamento = (camera.directionZ - camera.center)*0.1;
+			camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+			for (int i = 0; i < sources.size(); i++){
+				objects[selected_object].recalculate(sources[i].location, camera.center);
+			}
+		}
+		
+	}
+	if (key == ']') {
+		if (angle > 35){
+			angle -= 0.275;
+			Point3D deslocamento = (camera.directionZ - camera.center)*-0.1;
+			camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+			for (int i = 0; i < sources.size(); i++){
+				objects[selected_object].recalculate(sources[i].location, camera.center);
+			}
+		}
+	}
 }
 
 void hadleSpecialKeyboard(int key, int x, int y){
@@ -380,7 +460,6 @@ void hadleSpecialKeyboard(int key, int x, int y){
 			objects[selected_object].g = 0;
 			objects[selected_object].b = 0.5;
 		}
-
 	}
 	if (key == GLUT_KEY_F5){
 		//printf("entrou hihihi");
@@ -416,7 +495,6 @@ void hadleSpecialKeyboard(int key, int x, int y){
 			objects[selected_object].g = 1;
 			objects[selected_object].b = 1;
 		}
-
 	}
 	if (key == GLUT_KEY_F10){
 		//printf("entrou hihihi");
@@ -458,7 +536,6 @@ void getSelectedPaintObject(){
 
 }
 int main(int argc, char **argv){
-
 	//fonte de luz 1:
 	LightSource source1 = LightSource(0, 0 , 1000);
 	source1.setColor(1, 1, 1);
@@ -486,15 +563,6 @@ int main(int argc, char **argv){
 	objects[0].selectColor(1, 1, 1);
 	objects[0].recalculate(source1.location, camera.center);*/
 	
-	//setando objeto 2:
-	/*objects.push_back(readObject("teste.obj"));
-	objects[1].selectka(0.6);
-	objects[1].selectkd(0.5);
-	objects[1].selectks(0.5);
-	objects[1].selectq(1);
-	objects[1].selectColor(1,1,1);
-	objects[1].recalculate(source1.location, camera.center);*/
-
 	//setando objeto:
 	objects.push_back(readObject("Dog.obj"));
 	objects[0].selectka(0.6);
@@ -503,6 +571,15 @@ int main(int argc, char **argv){
 	objects[0].selectq(1);
 	objects[0].selectColor(1, 1, 0);
 	objects[0].recalculate(source1.location, camera.center);
+
+	//setando objeto 2:
+	objects.push_back(readObject("teste.obj"));
+	objects[1].selectka(0.6);
+	objects[1].selectkd(0.5);
+	objects[1].selectks(0.5);
+	objects[1].selectq(1);
+	objects[1].selectColor(1, 0, 1);
+	objects[1].recalculate(source1.location, camera.center);
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
@@ -510,19 +587,14 @@ int main(int argc, char **argv){
 	glutInitWindowSize(window_width, window_height);
 	glutCreateWindow("Projeto 1");
 	
-	
-
-
 	glutDisplayFunc(mydisplay);
 	glutReshapeFunc(myreshape);
 	glutIdleFunc(mydisplay);
-	
 	glutSpecialFunc(hadleSpecialKeyboard);
 	glutMouseFunc(handleMouse);
 	glutMotionFunc(handleMotion);
 	glutKeyboardFunc(hadleKeyboard);
 	glutSpecialUpFunc(hadleSpecialKeyboard);
-
 
 	glutMainLoop();
 	
