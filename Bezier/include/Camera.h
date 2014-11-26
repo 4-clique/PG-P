@@ -3,6 +3,8 @@
 
 #include <Point3D.h>
 #include <math.h>;
+#include <Transform.h>
+
 class Camera
 {
 public:
@@ -27,6 +29,8 @@ public:
 		zCamera = zCamera.normalized();
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
+		glGetDoublev(GL_MODELVIEW_MATRIX, modelview);               // Where The 16 Doubles Of The Projection Matrix Are To Be Stored
+		glGetDoublev(GL_PROJECTION_MATRIX, projection);
 		GLfloat extrinsic1[16] = {
 			1, 0, 0, 0,
 			0, 1, 0, 0,
