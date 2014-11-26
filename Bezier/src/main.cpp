@@ -69,7 +69,6 @@ void myreshape (GLsizei w, GLsizei h)
 	
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
-<<<<<<< HEAD
 	gluPerspective(30, ratio, 1, 3000);
 	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
 	glDepthFunc(GL_LESS);
@@ -78,10 +77,6 @@ void myreshape (GLsizei w, GLsizei h)
 void drawObjects(){
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	
-
-=======
 	gluPerspective(angle, window_width / window_height, near, 3000);
 
 	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
@@ -137,7 +132,6 @@ void drawObjects(){
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
->>>>>>> origin/scc
 	for (int j = 0; j < objects.size(); j++) {
 		glPushMatrix();
 		//glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
