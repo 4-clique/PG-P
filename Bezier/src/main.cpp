@@ -19,19 +19,47 @@ Referencia online para os comandos OpenGL (Man pages):
 
 #include "openGL_tutorial.h"
 #include <Transform.h>
+#include <Camera.h>
 #include <iostream>
 #include <math.h>
 
 using namespace std;
-GLfloat mouse_x, mouse_y;
-GLfloat window_width = 800.0;
-GLfloat window_height = 800.0;
+double window_width = 1080.0;
+double window_height = 1920.0;
 vector<Object3D> objects = vector<Object3D>();
 int selected_object = 0;
+int selected_light_source = 0;
+int togle = -1;
+double ia = 0.5;
+double id = 0.4;
+double is = 0.25;
+int t = 1;
+vector<LightSource> sources = vector<LightSource>();
 
-float lx = 0.0f, lz = -1.0f; //line of sight
-float eyeX = 0.0f, eyeZ = 5.0f; //posição da câmera
-float angle = 0.0f;
+double angle = 35;
+double near = 1;
+
+/*double fovy = 1;
+double frustrumTop = tan(fovy * 3.14159 / 360) * 0.1;
+double frustrumBottom = -frustrumTop;
+double frustrumLeft = window_width / window_height * frustrumBottom;
+double frustrumRight = window_width / window_height * frustrumTop;*/
+
+double zoom = window_height;
+
+
+//Propriedades da Camera
+Camera camera = Camera(
+	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL),
+	Point3D(CAMERAX_INICIAL+1, CAMERAY_INICIAL, CAMERAZ_INICIAL),
+	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL+1, CAMERAZ_INICIAL),
+	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL-1)
+	);
+
+
+//Movimento do mouse;
+int mouseInicialX = 0;
+int mouseInicialY = 0;
 
 void myreshape (GLsizei w, GLsizei h)
 {
@@ -40,66 +68,177 @@ void myreshape (GLsizei w, GLsizei h)
 		h = 1;
 	float ratio = w * 1.0 / h; // ratio dá no msm do w/h, só que tem isso de haver o retorno do h como 0, o que causa erro
 
+	/*GL.LoadIdentity();
+            GL.Enable(EnableCap.ScissorTest);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.Viewport(0, 0, 1.5*w, 1.5*h);
+            GL.Scissor(0, 0, w, h);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
+            GL.Ortho(0, 0, sceneView.Width, sceneView.Height, -1, 1);
+            GL.PushMatrix();
+            GL.Flush();
+ 
+            GL.LoadIdentity();
+            GL.Enable(EnableCap.ScissorTest);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.Viewport(0, sceneView.Height / 2, sceneView.Width, sceneView.Height / 2);
+            GL.Scissor(0, sceneView.Height / 2, sceneView.Width, sceneView.Height / 2);
+          Maths.ZAXIS);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
+            GL.Disable(EnableCap.ScissorTest);
+            GL.Flush();*/
+
+
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	glLoadIdentity(); 
 	glViewport(0, 0, w, h);
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
-	gluPerspective(45, ratio, 0, 1);
-	gluLookAt(0, 0, 100, 0, 0, 0, 0, 1, 1); // a visão de objetos mais distantes
-	glMatrixMode(GL_MODELVIEW);
+	gluPerspective(angle, window_width / window_height, near, 3000);
+
+	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
+	glDepthFunc(GL_LESS);
 }
 
-void mydisplay(void)
-{
+void drawPlane(){
+	glColor3f(.3, .3, .3);
+	glBegin(GL_QUADS);
+	glVertex3f(0, -5, 0);
+	glVertex3f(0, -5, 10);
+	glVertex3f(10, -5, 10);
+	glVertex3f(10, -5, 0);
+	glEnd();
 
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBegin(GL_LINES);
+	for (int i = 0; i <= 10; i++) {
+		if (i == 0) { glColor3f(.6, .3, .3); }
+		else { glColor3f(.25, .25, .25); };
+		glVertex3f(i, -5, 0);
+		glVertex3f(i, -5, 10);
+		if (i == 0) { glColor3f(.3, .3, .6); }
+		else { glColor3f(.25, .25, .25); };
+		glVertex3f(0, -5, i);
+		glVertex3f(10, -5, i);
+	};
+	glEnd();
 
-	glLoadIdentity(); //Substitui matrizes pela identidade (sem isso a câmera não funciona bem)
-	
-	//Look At Point = Line Of Sight + Camera Position >> em gluLookAt, os parâmetros centerX e centerZ são baseados nessa equação
+	glColor3f(0.5,0,0);
+	glBegin(GL_QUADS);
+	glVertex3f(-120,120,-100);
+	glVertex3f(-120, -120, -100);
+	glVertex3f(120, -120, -100);
+	glVertex3f(120, 120, -100);
+	glEnd();
+	glColor3f(0.5, 0.5, 0);
+	glBegin(GL_QUADS);
+	glVertex3f(-60, 60, -99);
+	glVertex3f(-60, -60, -99);
+	glVertex3f(60, -60, -99);
+	glVertex3f(60, 60, -99);
+	glEnd();
+	glColor3f(0.5, 0.5, 0.5);
+	glBegin(GL_QUADS);
+	glVertex3f(-30, 30, -98);
+	glVertex3f(-30, -30, -98);
+	glVertex3f(30, -30, -98);
+	glVertex3f(30, 30, -98);
+	glEnd();
+}
 
-	gluLookAt(eyeX, 1.0f, eyeZ, //visão do observador
-		eyeX + lx, 1.0f, eyeZ + lz, //lx e lz estão relacionados com o giro da câmera para direita e esquerda
-		.0f, 1.0f, .0f); //plano de visão da câmera, mudar um dos parâmetros, altera a inclinação do mundo
+void drawObjects(){
 
-	double x = 0;
-	double y = 0;
-	double size = 0.5;
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	for (int j = 0; j < objects.size();j++) {
-		if(j == selected_object) glColor3f(1, 0.54902, 0);//1 0.54902 0
-		else glColor3f(1, 1, 1);
+	for (int j = 0; j < objects.size(); j++) {
 		glPushMatrix();
-		glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
+		//glTranslatef(objects[j].altX, objects[j].altY, objects[j].altZ);
 		//glRotatef(objects[j].angleX, 1, 0, 0);
-		glRotatef(objects[j].angleY, 0, 1, 0);
-		glRotatef(objects[j].angleZ, 0, 0, 1);
 		glScaled(objects[j].scale, objects[j].scale, objects[j].scale);
+
 		for (int i = 0; i < objects[j].faces.size(); i++) {
+			double r = 0;
+			double g = 0;
+			double b = 0;
+			for (int t = 0; t < sources.size(); t++) {
+				r += ia*objects[j].ka*sources[t].r;
+				g += ia*objects[j].ka*sources[t].g;
+				b += ia*objects[j].ka*sources[t].b;
+				Point3D direcaoNormal = objects[j].normais[i];
+				Point3D direcaoF = sources[t].location - objects[j].faces[i].p1;
+				direcaoF = direcaoF.normalized();
+					//r += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].r;
+					//g += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].g;
+					//b += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].b;
+				/*	r += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
+					g += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
+					b += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));*/
+
+				if (direcaoF.dot(direcaoNormal) > 0){
+					//cout << direcaoF.dot(direcaoNormal) << endl;
+					r += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].r;
+					g += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].g;
+					b += id*objects[j].kd*(direcaoF.dot(direcaoNormal)) * sources[t].b;
+				}
+				if (objects[j].reflexaoLuz[i].dot(objects[j].v[i]) > 0){
+					r += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
+					g += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
+					b += (is*objects[j].ks*pow(objects[j].reflexaoLuz[i].dot(objects[j].v[i]), objects[j].q));
+				}
+			}
+			glColor3f(r*objects[j].r, g*objects[j].g, b*objects[j].b);//aux.x, aux.y, aux.z
 			glBegin(GL_TRIANGLES);
 			glVertex3f(objects[j].points[objects[j].faces[i].p1].x, objects[j].points[objects[j].faces[i].p1].y, objects[j].points[objects[j].faces[i].p1].z);
 			glVertex3f(objects[j].points[objects[j].faces[i].p2].x, objects[j].points[objects[j].faces[i].p2].y, objects[j].points[objects[j].faces[i].p2].z);
 			glVertex3f(objects[j].points[objects[j].faces[i].p3].x, objects[j].points[objects[j].faces[i].p3].y, objects[j].points[objects[j].faces[i].p3].z);
 			glEnd();
+			
 		}
 		glPopMatrix();
 	}
+}
 
+void mydisplay()
+{
 	
+	myreshape(window_width,window_height);
+
+	glClearDepth(1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+
+	camera.loadCamera();
+	
+	double x = 0;
+	double y = 0;
+	double size = 0.5;
+
+	drawObjects();
+	drawPlane();
 	glFlush();
 	glutPostRedisplay();
 }
 
 void handleMotion(int x, int y)
 {
+	camera.RotateMatrix((x - mouseInicialX)/ROTAT_CAMERA, 'y');
+	camera.RotateMatrix((y - mouseInicialY) / ROTAT_CAMERA, 'x');
+	mouseInicialX = x;
+	mouseInicialY = y;
+	for (int i = 0; i < sources.size(); i++){
+		objects[selected_object].recalculate(sources[i].location, camera.center);
+	}
+	/*cout << ((camera.directionX - camera.center).dot((camera.directionZ - camera.center)) /
+		((camera.directionX - camera.center).module()*(camera.directionZ - camera.center).module())) << endl;*/
 }
 
 void handleMouse(int btn, int state, int x, int y)
 {
+	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		mouseInicialX = x;
+		mouseInicialY = y;
+	}
 }
 
 void hadleKeyboard(unsigned char key, int x, int y)
@@ -108,31 +247,58 @@ void hadleKeyboard(unsigned char key, int x, int y)
 		exit(0);
 	}
 	if (key == '1'){
-		objects[selected_object].altX -= TRANS_SCALA;
+		objects[selected_object].translate(-TRANS_SCALA, 0, 0);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}		
 	}
 	if (key == '2'){
-		objects[selected_object].altX += TRANS_SCALA;
+		objects[selected_object].translate(TRANS_SCALA, 0, 0);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '3'){
-		objects[selected_object].altY -= TRANS_SCALA;
+		objects[selected_object].translate(0, -TRANS_SCALA, 0);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '4'){
-		objects[selected_object].altY += TRANS_SCALA;
+		objects[selected_object].translate(0, TRANS_SCALA, 0);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '5'){
-		objects[selected_object].altZ -= TRANS_SCALA;
+		objects[selected_object].translate(0, 0, -TRANS_SCALA);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '6'){
-		objects[selected_object].altZ += TRANS_SCALA;
+		objects[selected_object].translate(0, 0, TRANS_SCALA);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '7'){
 		objects[selected_object].RotateMatrix(1, 'x');
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '8'){
 		objects[selected_object].RotateMatrix(1, 'y');
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '9'){
 		objects[selected_object].RotateMatrix(1, 'z');
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 	if (key == '='){
 		objects[selected_object].scale = 1.01*objects[selected_object].scale;
@@ -146,26 +312,99 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key == ',') {
 		selected_object = (selected_object - 1) % objects.size();
 	}
+	if (key == 'a'){
+		Point3D deslocamento = (camera.directionX - camera.center)*-MOVE_CAMERA;
+		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
+	}
+	if (key == 'd'){
+		Point3D deslocamento = (camera.directionX - camera.center)*MOVE_CAMERA;
+		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
+	}
 
-	if (key == 'a'){ //câmera gira para a esquerda (objetos vão ficando pra direita)
-		angle -= 0.01f;
-		lx = sin(angle);
-		lz = -cos(angle);
+	if (key == 'w'){
+		Point3D deslocamento = (camera.directionZ - camera.center)*MOVE_CAMERA;
+		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
-	if (key == 'd'){ //câmera gira para a direita (objetos vão ficando pra esquerda)
-		angle += 0.01f;
-		lx = sin(angle);
-		lz = -cos(angle);
+	if (key == 's'){
+		Point3D deslocamento = (camera.directionZ - camera.center)*-MOVE_CAMERA;
+		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
-
-	// lx ou lz multiplicados por um fator de aproximação; quanto maior, mais rápido se aproxima dos objetos
-	if (key == 'w'){ //aproximação da câmera
-		eyeX += lx * 2;
-		eyeZ += lz * 2;
+	if (key == 'f'){
+		Point3D cameraDirection = (camera.directionZ - camera.center).normalized();
+		Point3D objectDirection = (objects[selected_object].bariCenter - camera.center).normalized();
+		/*cout << cameraDirection.dot(objectDirection) << endl;
+		cout << acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1) << endl;*/
+		cout << cameraDirection.x - objectDirection.x << endl;
+		if (cameraDirection.x - objectDirection.x <= -0.1){
+			if ((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)) > 1.02) camera.RotateMatrix(-(acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)), 'y');
+		}
+		else if (cameraDirection.x - objectDirection.x >= 0.1){
+			if ((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)) > 1.02) camera.RotateMatrix((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)), 'y');
+		}
 	}
-	if (key == 's'){ //afastamento da câmera
-		eyeX -= lx * 2;
-		eyeZ -= lz * 2;
+	if (key=='e') {
+		sources[selected_light_source].location.x -= LIGHT_SCALA;
+	}
+	if (key=='r') {
+		sources[selected_light_source].location.x += LIGHT_SCALA;
+	}
+	if (key=='t') {
+		sources[selected_light_source].location.y -= LIGHT_SCALA;
+	}
+	if (key=='y'){
+		sources[selected_light_source].location.y += LIGHT_SCALA;
+	}
+	if (key == 'u') {
+		sources[selected_light_source].location.z -= LIGHT_SCALA;
+	}
+	if (key == 'i') {
+		sources[selected_light_source].location.z += LIGHT_SCALA;
+	}
+	if (key=='o') {
+		selected_light_source = (selected_light_source + 1) % sources.size();
+	}
+	if (key =='p') {
+		selected_light_source = (selected_light_source - 1) % sources.size();
+	}
+	if (key == '[') {
+		if (angle < 64){
+			angle += 0.275;
+			Point3D deslocamento = (camera.directionZ - camera.center)*0.1;
+			camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+			for (int i = 0; i < sources.size(); i++){
+				objects[selected_object].recalculate(sources[i].location, camera.center);
+			}
+		}
+		
+	}
+	if (key == ']') {
+		if (angle > 35){
+			angle -= 0.275;
+			Point3D deslocamento = (camera.directionZ - camera.center)*-0.1;
+			camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+			for (int i = 0; i < sources.size(); i++){
+				objects[selected_object].recalculate(sources[i].location, camera.center);
+			}
+		}
+		//near++;
+		/*Point3D deslocamento = (camera.directionZ - camera.center)*-0.1;
+		camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}*/
+		
 	}
 }
 
@@ -173,28 +412,72 @@ void hadleSpecialKeyboard(int key, int x, int y)
 {
 }
 
+int main(int argc, char **argv){
 
-int main(int argc, char **argv)
-{
-	objects.push_back(readObject("pumpkin.obj"));
+	//fonte de luz 1:
+	LightSource source1 = LightSource(0, 0 , 1000);
+	source1.setColor(1, 1, 1);
+	sources.push_back(source1);
+
+	//fonte de luz 2:
+	LightSource source2 = LightSource(0, 0, 11);
+	source2.setColor(0, 0, 1);
+	//sources.push_back(source2);
+
+	//setando objeto 0:
+	/*objects.push_back(readObject("pumpkin.obj"));
+	objects[0].selectka(0.3);
+	objects[0].selectkd(0.45);
+	objects[0].selectks(1);
+	objects[0].selectq(10);
+	objects[0].selectColor(0.8, 0.4, 0);
+	objects[0].recalculate(source1.location, camera.center);*/
+	//setando objeto 1:
+	/*objects.push_back(readObject("dog.obj"));
+	objects[0].selectka(0.6);
+	objects[0].selectkd(0.5);
+	objects[0].selectks(0.55);
+	objects[0].selectq(1);
+	objects[0].selectColor(1, 1, 1);
+	objects[0].recalculate(source1.location, camera.center);*/
+	
+	
+
+	//setando objeto:
+	objects.push_back(readObject("Dog.obj"));
+	objects[0].selectka(0.6);
+	objects[0].selectkd(0.5);
+	objects[0].selectks(0.5);
+	objects[0].selectq(1);
+	objects[0].selectColor(1, 1, 0);
+	objects[0].recalculate(source1.location, camera.center);
+
+	//setando objeto 2:
 	objects.push_back(readObject("teste.obj"));
+	objects[1].selectka(0.6);
+	objects[1].selectkd(0.5);
+	objects[1].selectks(0.5);
+	objects[1].selectq(1);
+	objects[1].selectColor(1, 0, 1);
+	objects[1].recalculate(source1.location, camera.center);
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+	glEnable(GL_DEPTH_TEST);
 	glutInitWindowSize(window_width, window_height);
 	glutCreateWindow("Projeto 1");
-
+	
 	glutDisplayFunc(mydisplay);
 	glutReshapeFunc(myreshape);
 	glutIdleFunc(mydisplay);
-	//glutSpecialFunc(processSpecialKeys);
+	glutSpecialFunc(hadleSpecialKeyboard);
 	glutMouseFunc(handleMouse);
 	glutMotionFunc(handleMotion);
 	glutKeyboardFunc(hadleKeyboard);
 	glutSpecialUpFunc(hadleSpecialKeyboard);
-	
-	//glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
 
 	glutMainLoop();
 	return 1;
 
 }
+
