@@ -18,6 +18,7 @@
 #include <LightSource.h>
 #include <float.h>
 #include <limits.h>
+const double LIGHT_SCALA = 30;
 const double TRANS_SCALA = 1;
 const double ROTAT_SCALA = 4;
 const double MOVE_CAMERA = 0.75;

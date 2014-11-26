@@ -15,12 +15,19 @@ Para os objetos:
 '-' ou '_' modifica a escala do objeto decrementando seu tamanho em 1%
 '+' ou '=' modifica a escala do objeto incrementando seu tamanho em 1%
 
-Para fontes de luz:
-'q'
+Para a câmera:
+'a'
+'d'
 'w'
-'e'
-'r'
-'t'
-'y'
-'u' seleciona a fonte de luz anterior
-'i' seleciona a próxima fonte de luz
+'s'
+'f'
+
+Para fontes de luz:
+'e' a luz é transladada no sentido negativo do eixo X
+'r' a luz é transladada no sentido positivo do eixo X
+'t' a luz é transladada no sentido negativo do eixo y
+'y' a luz é transladada no sentido positivo do eixo y
+'u' a luz é transladada no sentido negativo do eixo z
+'i' a luz é transladada no sentido positivo do eixo z
+'o' seleciona a fonte de luz anterior
+'p' seleciona a próxima fonte de luz
