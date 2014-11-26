@@ -29,14 +29,13 @@ double window_height = 1920.0;
 vector<Object3D> objects = vector<Object3D>();
 int selected_object = 0;
 int selected_light_source = 0;
-GLint viewport[4];                  // Where The Viewport Values Will Be Stored
-int object_to_paint = 0;
 int togle = -1;
 double ia = 0.5;
 double id = 0.4;
 double is = 0.25;
 int t = 1;
 vector<LightSource> sources = vector<LightSource>();
+bool diretorON = false;
 
 double angle = 35;
 double near = 1;
@@ -49,9 +48,17 @@ Camera camera = Camera(
 	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL-1)
 	);
 
+Camera diretor = Camera(
+	Point3D(DIRETORX, DIRETORY, DIRETORZ),
+	Point3D(DIRETORX + 1, DIRETORY, DIRETORZ),
+	Point3D(DIRETORX, DIRETORY + 1, DIRETORZ),
+	Point3D(DIRETORX, DIRETORY, DIRETORZ - 1)
+	);
+
 //Movimento do mouse;
 int mouseInicialX = 0;
 int mouseInicialY = 0;
+
 
 void myreshape (GLsizei w, GLsizei h)
 {
@@ -64,12 +71,9 @@ void myreshape (GLsizei w, GLsizei h)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity(); 
 	glViewport(0, 0, w, h);
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	//glViewport(0, 0, w, h);
-	
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
-	gluPerspective(30, ratio, 1, 3000);
+	gluPerspective(30, ratio/2, 1, 3000);
 	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
 	glDepthFunc(GL_LESS);
 }
@@ -180,25 +184,39 @@ void drawObjects(){
 	}
 }
 
-void drawPalette(){
-
-	//glutSolidCube(2);
-	//glPointSize(10);
-	glPointSize(20);
-	glColor3f(1, 1, 1);
-
-	glBegin(GL_POINTS);
-
-	
-	
-	glVertex3f(0, 0, 0);
+void drawCamera(Camera camera) {
+	/*
+	Point3D center;
+	Point3D directionX;
+	Point3D directionY;
+	Point3D directionZ;
+	*/
+	Point3D ct = camera.center;
+	//direction x:
+	glBegin(GL_LINES);
 	glColor3f(1, 0, 0);
-	glVertex3f(1, 1, 0);
-	//glVertex3f(20, 20, 1);
+	glVertex3f(camera.directionX.x, camera.directionX.y, camera.directionX.z);
+	glVertex3f(ct.x, ct.y, ct.z);
 	glEnd();
+	//direction y:
+	glBegin(GL_LINES);
+	glColor3f(0, 0, 1);
+	glVertex3f(camera.directionY.x, camera.directionY.y, camera.directionY.z);
+	glVertex3f(ct.x, ct.y, ct.z);
+	glEnd();
+	//direction z:
+	glBegin(GL_LINES);
+	glColor3f(1, 1, 0);
+	glVertex3f(camera.directionZ.x, camera.directionZ.y, camera.directionZ.z);
+	glVertex3f(ct.x, ct.y, ct.z);
+	glEnd();
+	//quadrado:
+	glColor3f(0, 1, 0);
+	glPushMatrix();
+	glTranslated(ct.x, ct.y, ct.z);
+	glutWireCube(1);
+	glPopMatrix();
 
-	
-	
 }
 
 void mydisplay()
@@ -208,22 +226,22 @@ void mydisplay()
 	glClearDepth(1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	glViewport(window_width - window_width / 4, 0, window_width / 4, window_height / 4);
-	//glMatrixMode(GL_MODELVIEW);
-	//glLoadIdentity();
-	drawPalette();
-
-	camera.loadCamera();
-	
 	double x = 0;
 	double y = 0;
 	double size = 0.5;
+	//myreshape(window_width, window_height);
+	//drawObjects();
 	
-
-	
-
-	glViewport(0, 0, window_width, window_height);
+	//JANELA 1:
+	glViewport(0, 0, window_width / 2, window_height); 
+	camera.loadCamera();
 	drawObjects();
+	
+	//JANELA 2:
+	glViewport(window_width / 2, 0, window_width / 2, window_height); 
+	diretor.loadCamera();
+	drawObjects();
+	drawCamera(camera);
 	
 	glFlush();
 	glutPostRedisplay();
@@ -238,8 +256,6 @@ void handleMotion(int x, int y)
 	for (int i = 0; i < sources.size(); i++){
 		objects[selected_object].recalculate(sources[i].location, camera.center);
 	}
-	/*cout << ((camera.directionX - camera.center).dot((camera.directionZ - camera.center)) /
-		((camera.directionX - camera.center).module()*(camera.directionZ - camera.center).module())) << endl;*/
 }
 
 void handleMouse(int btn, int state, int x, int y)
@@ -353,8 +369,6 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key == 'f'){
 		Point3D cameraDirection = (camera.directionZ - camera.center).normalized();
 		Point3D objectDirection = (objects[selected_object].bariCenter - camera.center).normalized();
-		/*cout << cameraDirection.dot(objectDirection) << endl;
-		cout << acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1) << endl;*/
 		cout << cameraDirection.x - objectDirection.x << endl;
 		if (cameraDirection.x - objectDirection.x <= -0.1){
 			if ((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)) > 1.02) camera.RotateMatrix(-(acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)), 'y');
@@ -384,17 +398,8 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key=='o') {
 		selected_light_source = (selected_light_source + 1) % sources.size();
 	}
-	if (key =='k') {
-		selected_light_source = (selected_light_source - 1) % sources.size();
-	}
 	if (key == 'p') {
-		if (PAINT_FACE){
-			PAINT_FACE = false;
-		}
-		else{
-			PAINT_FACE = true;
-		}
-		
+		selected_light_source = (selected_light_source - 1) % sources.size();
 	}
 	if (key == '[') {
 		if (angle < 64){
@@ -517,18 +522,10 @@ void hadleSpecialKeyboard(int key, int x, int y){
 		}
 
 	}
-
 }
 
-/* getSelectedPaintFace(){
-	Point2D mouse;
 
 
-
-}*/
-void getSelectedPaintObject(){
-
-}
 int main(int argc, char **argv){
 	//fonte de luz 1:
 	LightSource source1 = LightSource(0, 0 , 1000);
@@ -591,9 +588,7 @@ int main(int argc, char **argv){
 	glutSpecialUpFunc(hadleSpecialKeyboard);
 
 	glutMainLoop();
-	
 	return 1;
-	
 
 }
 
