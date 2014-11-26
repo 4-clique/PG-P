@@ -29,6 +29,8 @@ double window_height = 1920.0;
 vector<Object3D> objects = vector<Object3D>();
 int selected_object = 0;
 int selected_light_source = 0;
+GLint viewport[4];                  // Where The Viewport Values Will Be Stored
+int object_to_paint = 0;
 int togle = -1;
 double ia = 0.5;
 double id = 0.4;
@@ -44,6 +46,7 @@ Camera camera = Camera(
 	Point3D(CAMERAX_INICIAL, CAMERAY_INICIAL, CAMERAZ_INICIAL-1)
 	);
 
+Camera paleta = 
 
 //Movimento do mouse;
 int mouseInicialX = 0;
@@ -59,6 +62,9 @@ void myreshape (GLsizei w, GLsizei h)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glViewport(0, 0, w, h);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	//glViewport(0, 0, w, h);
+	
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
 	gluPerspective(30, ratio, 1, 3000);
@@ -120,6 +126,27 @@ void drawObjects(){
 	}
 }
 
+void drawPalette(){
+
+	//glutSolidCube(2);
+	//glPointSize(10);
+	glPointSize(20);
+	glColor3f(1, 1, 1);
+
+	glBegin(GL_POINTS);
+
+	
+	
+	glVertex3f(0, 0, 0);
+	glColor3f(1, 0, 0);
+	glVertex3f(1, 1, 0);
+	//glVertex3f(20, 20, 1);
+	glEnd();
+
+	
+	
+}
+
 void mydisplay()
 {
 
@@ -127,14 +154,23 @@ void mydisplay()
 	glClearDepth(1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+	glViewport(window_width - window_width / 4, 0, window_width / 4, window_height / 4);
+	//glMatrixMode(GL_MODELVIEW);
+	//glLoadIdentity();
+	drawPalette();
 
 	camera.loadCamera();
 	
 	double x = 0;
 	double y = 0;
 	double size = 0.5;
+	
 
+	
+
+	glViewport(0, 0, window_width, window_height);
 	drawObjects();
+	
 
 	glFlush();
 	glutPostRedisplay();
@@ -295,15 +331,132 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key=='o') {
 		selected_light_source = (selected_light_source + 1) % sources.size();
 	}
-	if (key =='p') {
+	if (key =='k') {
 		selected_light_source = (selected_light_source - 1) % sources.size();
+	}
+	if (key == 'p') {
+		if (PAINT_FACE){
+			PAINT_FACE = false;
+		}
+		else{
+			PAINT_FACE = true;
+		}
+		
 	}
 }
 
-void hadleSpecialKeyboard(int key, int x, int y)
-{
+void hadleSpecialKeyboard(int key, int x, int y){
+	if (key == GLUT_KEY_F1){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 0;
+			objects[selected_object].g = 0.1;
+			objects[selected_object].b = 1;
+		}
+
+	}
+	if (key == GLUT_KEY_F2){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 0;
+			objects[selected_object].g = 0.8;
+			objects[selected_object].b = 0;
+		}
+
+	}
+	if (key == GLUT_KEY_F3){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 1;
+			objects[selected_object].g = 0;
+			objects[selected_object].b = 0;
+		}
+		
+	}
+	if (key == GLUT_KEY_F4){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 0.5;
+			objects[selected_object].g = 0;
+			objects[selected_object].b = 0.5;
+		}
+
+	}
+	if (key == GLUT_KEY_F5){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 1;
+			objects[selected_object].g = 0.2;
+			objects[selected_object].b = 0.4;
+		}
+
+	}
+	if (key == GLUT_KEY_F6){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 1;
+			objects[selected_object].g = 0.6;
+			objects[selected_object].b = 0.1;
+		}
+
+	}
+	if (key == GLUT_KEY_F7){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 1;
+			objects[selected_object].g = 1;
+			objects[selected_object].b = 0;
+		}
+
+	}
+	if (key == GLUT_KEY_F8){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 1;
+			objects[selected_object].g = 1;
+			objects[selected_object].b = 1;
+		}
+
+	}
+	if (key == GLUT_KEY_F10){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 0.67;
+			objects[selected_object].g = 1;
+			objects[selected_object].b = 0.18;
+		}
+
+	}
+	if (key == GLUT_KEY_F11){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 0.5;
+			objects[selected_object].g = 1;
+			objects[selected_object].b = 0.8;
+		}
+
+	}
+	if (key == GLUT_KEY_F9){
+		//printf("entrou hihihi");
+		if (!PAINT_FACE){
+			objects[selected_object].r = 0.87;
+			objects[selected_object].g = 0.72;
+			objects[selected_object].b = 0.53;
+		}
+
+	}
+
 }
 
+/* getSelectedPaintFace(){
+	Point2D mouse;
+
+
+
+}*/
+void getSelectedPaintObject(){
+
+}
 int main(int argc, char **argv){
 
 	//fonte de luz 1:
@@ -357,17 +510,24 @@ int main(int argc, char **argv){
 	glutInitWindowSize(window_width, window_height);
 	glutCreateWindow("Projeto 1");
 	
+	
+
+
 	glutDisplayFunc(mydisplay);
 	glutReshapeFunc(myreshape);
 	glutIdleFunc(mydisplay);
+	
 	glutSpecialFunc(hadleSpecialKeyboard);
 	glutMouseFunc(handleMouse);
 	glutMotionFunc(handleMotion);
 	glutKeyboardFunc(hadleKeyboard);
 	glutSpecialUpFunc(hadleSpecialKeyboard);
 
+
 	glutMainLoop();
+	
 	return 1;
+	
 
 }
 
