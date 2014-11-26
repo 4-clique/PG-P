@@ -18,7 +18,6 @@
 #include <LightSource.h>
 #include <float.h>
 #include <limits.h>
-//#include <Point2D.h>
 const double LIGHT_SCALA = 30;
 const double TRANS_SCALA = 1;
 const double ROTAT_SCALA = 4;
@@ -27,9 +26,10 @@ const double ROTAT_CAMERA = 10;
 const double CAMERAX_INICIAL = 0;
 const double CAMERAY_INICIAL = 0;
 const double CAMERAZ_INICIAL = 10;
-bool PAINT_FACE = true;
-GLdouble modelview[16];                
-GLdouble projection[16];
+const double DIRETORX = 0;
+const double DIRETORY = 0;
+const double DIRETORZ = 20;
+
 
 Object3D readObject(string arquivo){
 	ifstream ifs(arquivo, ifstream::in);
