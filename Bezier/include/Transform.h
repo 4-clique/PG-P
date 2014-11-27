@@ -29,7 +29,7 @@ const double CAMERAZ_INICIAL = 10;
 const double DIRETORX = 0;
 const double DIRETORY = 0;
 const double DIRETORZ = 20;
-
+bool PAINT_FACE = true;
 
 Object3D readObject(string arquivo){
 	ifstream ifs(arquivo, ifstream::in);

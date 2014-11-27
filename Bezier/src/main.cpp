@@ -78,14 +78,6 @@ void myreshape (GLsizei w, GLsizei h)
 	glDepthFunc(GL_LESS);
 }
 
-void drawObjects(){
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	gluPerspective(angle, window_width / window_height, near, 3000);
-
-	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
-	glDepthFunc(GL_LESS);
-}
 
 void drawPlane(){
 	glColor3f(.3, .3, .3);
