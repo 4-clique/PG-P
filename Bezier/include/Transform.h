@@ -22,14 +22,14 @@
 const double LIGHT_SCALA = 30;
 const double TRANS_SCALA = 1;
 const double ROTAT_SCALA = 4;
-const double MOVE_CAMERA = 0.5;
-const double ROTAT_CAMERA = 10;
+const double MOVE_CAMERA = 0.75;
+const double ROTAT_CAMERA = 20;
 const double CAMERAX_INICIAL = 0;
 const double CAMERAY_INICIAL = 0;
 const double CAMERAZ_INICIAL = 10;
 const double DIRETORX = 0;
 const double DIRETORY = 0;
-const double DIRETORZ = 20;
+const double DIRETORZ = 40;
 bool PAINT_FACE = true;
 
 Object3D readObject(string arquivo){

@@ -10,13 +10,40 @@ public:
 	Point3D directionX;
 	Point3D directionY;
 	Point3D directionZ;
+	vector<Point3D> cubo;
 	Camera(){};
 	Camera(Point3D c, Point3D xAxes, Point3D yAxes, Point3D zAxes){
 		center = c;
 		directionX = xAxes;
 		directionY = yAxes;
 		directionZ = zAxes;
+		CalculateCube(c);
 	};
+
+	void CalculateCube(Point3D c) {
+		Point3D c1 = Point3D(c.x + 0.5, c.y + 0.5, c.z + 1);
+		Point3D c2 = Point3D(c.x + 0.5, c.y + 0.5, c.z - 1);
+		Point3D c3 = Point3D(c.x + 0.5, c.y - 0.5, c.z + 1);
+		Point3D c4 = Point3D(c.x + 0.5, c.y - 0.5, c.z - 1);
+		Point3D c5 = Point3D(c.x - 0.5, c.y + 0.5, c.z + 1);
+		Point3D c6 = Point3D(c.x - 0.5, c.y + 0.5, c.z - 1);
+		Point3D c7 = Point3D(c.x - 0.5, c.y - 0.5, c.z + 1);
+		Point3D c8 = Point3D(c.x - 0.5, c.y - 0.5, c.z - 1);
+		cubo.push_back(c1);
+		cubo.push_back(c2);
+		cubo.push_back(c3);
+		cubo.push_back(c4);
+		cubo.push_back(c5);
+		cubo.push_back(c6);
+		cubo.push_back(c7);
+		cubo.push_back(c8);
+	}
+
+	void emptyCube() {
+		while (cubo.size() != 0) {
+			cubo.pop_back();
+		}
+	}
 
 	void loadCamera(){
 		Point3D xCamera = directionX-center;
@@ -68,6 +95,11 @@ public:
 		directionX.z += transZ;
 		directionY.z += transZ;
 		directionZ.z += transZ;
+		for (int i = 0; i < cubo.size(); i++) {
+			cubo[i].x += transX;
+			cubo[i].y += transY;
+			cubo[i].z += transZ;
+		}
 	};
 
 	void RotateMatrix(double degrees, char axis){
@@ -76,30 +108,39 @@ public:
 		if (axis == 'y'){
 			double dxX = directionX.x;
 			double dxZ = directionX.z;
-			directionX.x = cos((acos(-1.0)*degrees)/180.0)*dxX + sin((acos(-1.0)*degrees)/180.0)* dxZ;
-			directionX.z = cos((acos(-1.0)*degrees)/180.0)*dxZ - sin((acos(-1.0)*degrees)/180.0)* dxX;
-
+			directionX.x = cos((acos(-1.0)*degrees)/180.0)*dxX - sin((acos(-1.0)*degrees)/180.0)* dxZ;
+			directionX.z = cos((acos(-1.0)*degrees)/180.0)*dxZ + sin((acos(-1.0)*degrees)/180.0)* dxX;
 			directionZ.x = - directionX.y*directionY.z + directionX.z*directionY.y;
 			directionZ.y = - directionX.z*directionY.x + directionX.x*directionY.z;
 			directionZ.z = - directionX.x*directionY.y + directionX.y*directionY.x;
+
+			for (int i = 0; i < cubo.size(); i++) {
+				double dx = cubo[i].x;
+				double dz = cubo[i].z;
+				cubo[i].x = cos((acos(-1.0)*degrees) / 180.0)*dx - sin((acos(-1.0)*degrees) / 180.0)* dz;
+				cubo[i].z = cos((acos(-1.0)*degrees) / 180.0)*dz + sin((acos(-1.0)*degrees) / 180.0)* dx;
+			}
 		}
-		if (axis == 'x'){
+		else if (axis == 'x'){
 			double dyY = directionY.y;
 			double dyZ = directionY.z;
 			directionY.y = cos((acos(-1.0)*degrees)/180.0)*dyY - sin((acos(-1.0)*degrees)/180.0) *dyZ;
 			directionY.z = sin((acos(-1.0)*degrees)/180.0)*dyY + cos((acos(-1.0)*degrees)/180.0)*dyZ;
-
 			directionZ.x = -directionX.y*directionY.z + directionX.z*directionY.y;
 			directionZ.y = -directionX.z*directionY.x + directionX.x*directionY.z;
 			directionZ.z = -directionX.x*directionY.y + directionX.y*directionY.x;
+			for (int i = 0; i < cubo.size(); i++) {
+				double dy = cubo[i].y;
+				double dz = cubo[i].z;
+				cubo[i].y = cos((acos(-1.0)*degrees) / 180.0)*dy - sin((acos(-1.0)*degrees) / 180.0) *dz;
+				cubo[i].z = sin((acos(-1.0)*degrees) / 180.0)*dy + cos((acos(-1.0)*degrees) / 180.0)*dz;
+			}
 		}
 		directionX = directionX.normalized();
 		directionY = directionY.normalized();
 		directionZ = directionZ.normalized();
-		/*cout << directionX.x << " " << directionX.y << " " << directionX.z << endl;
-		cout << directionZ.x << " " << directionZ.y << " " << directionZ.z << endl;*/
 		translate(c.x, c.y, c.z);
-		
+
 	};
 
 private:

@@ -35,8 +35,8 @@ double id = 0.4;
 double is = 0.25;
 int t = 1;
 vector<LightSource> sources = vector<LightSource>();
-bool diretorON = true;
-
+bool diretorON = false;
+float ratio;
 double angle = 35;
 double near = 13;
 
@@ -65,24 +65,22 @@ int mouseInicialY = 0;
 void myreshape (GLsizei w, GLsizei h)
 {
 	// evita uma divisão por zero na hora do reshape
-	if (h == 0)
-		h = 1;
-	float ratio = w * 1.0 / h; // ratio dá no msm do w/h, só que tem isso de haver o retorno do h como 0, o que causa erro
+	if (h == 0) h = 1;
+	if (diretorON) ratio = (w * 1.0 / h)/2; // ratio dá no msm do w/h, só que tem isso de haver o retorno do h como 0, o que causa erro
+	else ratio = w * 1.0 / h;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity(); 
 	glViewport(0, 0, w, h);
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
-	
+
 	if (!dolly){
 		gluPerspective(angle, window_width / window_height, 1, 3000);
 	} else {
 		//glFrustum(frustrumLeft, frustrumRight, frustrumBottom, frustrumTop, near, 3000);
 		glFrustum( -13, 13, -13, 13, near, 3000);
 	}
-	
-	//glFrustum( -3, 3, -3, 3, near, 1000);
 	
 	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
 	glDepthFunc(GL_LESS);
@@ -340,7 +338,8 @@ void drawCamera(Camera camera) {
 	*/
 	Point3D ct = camera.center;
 	//direction x:
-	glBegin(GL_LINES);
+	/*glBegin(GL_LINES);
+	
 	glColor3f(1, 0, 0);
 	glVertex3f(camera.directionX.x, camera.directionX.y, camera.directionX.z);
 	glVertex3f(ct.x, ct.y, ct.z);
@@ -352,18 +351,45 @@ void drawCamera(Camera camera) {
 	glVertex3f(ct.x, ct.y, ct.z);
 	glEnd();
 	//direction z:
+	//glEnable(GL_LINE_WIDTH);//GL_LINE_SMOOTH*/
+
 	glBegin(GL_LINES);
 	glColor3f(1, 1, 0);
-	glVertex3f(camera.directionZ.x, camera.directionZ.y, camera.directionZ.z);
-	glVertex3f(ct.x, ct.y, ct.z);
+	glVertex3d(camera.directionZ.x, camera.directionZ.y, camera.directionZ.z);
+	glVertex3d(ct.x, ct.y, ct.z);
 	glEnd();
 	//quadrado:
-	glColor3f(0, 1, 0);
+	for (int i = 0; i < camera.cubo.size(); i++) {
+		for (int j = i + 1; j < camera.cubo.size(); j++) {
+			glBegin(GL_LINES);
+			glColor3f(0, 1, 0);
+			glVertex3d(camera.cubo[i].x, camera.cubo[i].y, camera.cubo[i].z);
+			glVertex3d(camera.cubo[j].x, camera.cubo[j].y, camera.cubo[j].z);
+			glEnd();
+		}
+	}
+	//pontos do cubo:
+	for (int i = 0; i < 8; i++) {
+		glPointSize(10);
+		glBegin(GL_POINTS);
+		
+		glColor3f(0, 0, 1);
+		glVertex3f(camera.cubo[i].x, camera.cubo[i].y, camera.cubo[i].z);
+		//printf("cubo>> %f %f %f", diretor.cubo[i].x, diretor.cubo[i].y, diretor.cubo[i].z);
+		glEnd();
+	}
+	/*glBegin(GL_POINTS);
+	glPointSize(5);
+	glColor3f(0, 0, 1);
+	glVertex3f(diretor.cubo[0].x, diretor.cubo[0].y, diretor.cubo[0].z);
+	//printf("cubo>> %f %f %f", diretor.cubo[i].x, diretor.cubo[i].y, diretor.cubo[i].z);
+	glEnd();*/
+	//cilindro:
+	/*glColor3f(1, 0, 0);
 	glPushMatrix();
 	glTranslated(ct.x, ct.y, ct.z);
-	glutWireCube(1);
-	glPopMatrix();
-
+	//gluCylinder(1);
+	glPopMatrix();*/
 }
 
 void mydisplay()
@@ -377,30 +403,33 @@ void mydisplay()
 	double y = 0;
 	double size = 0.5;
 	
-	//drawObjects();
-	
-	//JANELA 1:
-	glViewport(0, 0, window_width / 2, window_height); 
-	camera.loadCamera();
-	drawObjects();
-	drawGrid();
-	
-	//JANELA 2:
-	if (diretorON){
+	if (diretorON) {
+		//JANELA 1:
+		glViewport(0, 0, window_width / 2, window_height);
+		camera.loadCamera();
+		drawObjects();
+		drawGrid();
+
+		//JANELA 2:
 		glViewport(window_width / 2, 0, window_width / 2, window_height);
 		diretor.loadCamera();
 		drawObjects();
 		drawCamera(camera);
+		drawGrid();
 	}
-	
-	//drawPlane();
-	drawGrid();
+	else {
+		glViewport(0, 0, window_width, window_height);
+		camera.loadCamera();
+		drawObjects();
+		drawGrid();
+	}
 	glFlush();
 	glutPostRedisplay();
 }
 
 void handleMotion(int x, int y)
 {
+	//double degrees =  ((x - mouseInicialX) / ROTAT_CAMERA);//acos(-1.0)*
 	camera.RotateMatrix((x - mouseInicialX)/ROTAT_CAMERA, 'y');
 	camera.RotateMatrix((y - mouseInicialY) / ROTAT_CAMERA, 'x');
 	mouseInicialX = x;
@@ -578,6 +607,29 @@ void hadleKeyboard(unsigned char key, int x, int y)
 			near -= deslocamento.module();
 		}
 	}
+	if (key == 'x') {
+		if (diretorON) {
+			diretorON = false;
+			myreshape(window_width, window_height);
+		}
+		else {
+			diretorON = true;
+			myreshape(window_width, window_height);
+		}
+	}
+	if (key == 'm') {
+		Point3D deslocamento = (diretor.directionX - diretor.center)*-MOVE_CAMERA;
+		diretor.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+	}
+	if (key == 'n') {
+		Point3D deslocamento = (diretor.directionX - diretor.center)*+MOVE_CAMERA;
+		diretor.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+	}
+	if (key == 'b') {
+		Point3D deslocamento = (diretor.directionY - diretor.center)*+MOVE_CAMERA;
+		diretor.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+	}
+	
 }
 
 void hadleSpecialKeyboard(int key, int x, int y){
