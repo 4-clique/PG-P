@@ -10,6 +10,7 @@ public:
 	Point3D directionX;
 	Point3D directionY;
 	Point3D directionZ;
+	Object3D cameraCubo;
 	vector<Point3D> cubo;
 	Camera(){};
 	Camera(Point3D c, Point3D xAxes, Point3D yAxes, Point3D zAxes){
@@ -132,7 +133,8 @@ public:
 			for (int i = 0; i < cubo.size(); i++) {
 				double dy = cubo[i].y;
 				double dz = cubo[i].z;
-				cubo[i].y = cos((acos(-1.0)*degrees) / 180.0)*dy - sin((acos(-1.0)*degrees) / 180.0) *dz;
+				cubo[i].y =
+					cos((acos(-1.0)*degrees) / 180.0)*dy - sin((acos(-1.0)*degrees) / 180.0) *dz;
 				cubo[i].z = sin((acos(-1.0)*degrees) / 180.0)*dy + cos((acos(-1.0)*degrees) / 180.0)*dz;
 			}
 		}
