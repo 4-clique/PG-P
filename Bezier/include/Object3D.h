@@ -66,9 +66,6 @@ public:
 			points[i].y += transY;
 			points[i].z += transZ;
 		}
-		bariCenter.x += transX;
-		bariCenter.y += transY;
-		bariCenter.z += transZ;
 	}
 
 	void RotateMatrix(double degrees, char axis){

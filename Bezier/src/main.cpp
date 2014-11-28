@@ -165,11 +165,22 @@ void drawObjects(){
 				}
 			}
 			glColor3f(r*objects[j].r, g*objects[j].g, b*objects[j].b);//aux.x, aux.y, aux.z
-			glBegin(GL_TRIANGLES);
-			glVertex3f(objects[j].points[objects[j].faces[i].p1].x, objects[j].points[objects[j].faces[i].p1].y, objects[j].points[objects[j].faces[i].p1].z);
-			glVertex3f(objects[j].points[objects[j].faces[i].p2].x, objects[j].points[objects[j].faces[i].p2].y, objects[j].points[objects[j].faces[i].p2].z);
-			glVertex3f(objects[j].points[objects[j].faces[i].p3].x, objects[j].points[objects[j].faces[i].p3].y, objects[j].points[objects[j].faces[i].p3].z);
-			glEnd();
+			if (objects[j].faces[i].type == 1){
+				glBegin(GL_TRIANGLES);
+				glVertex3f(objects[j].points[objects[j].faces[i].p1].x, objects[j].points[objects[j].faces[i].p1].y, objects[j].points[objects[j].faces[i].p1].z);
+				glVertex3f(objects[j].points[objects[j].faces[i].p2].x, objects[j].points[objects[j].faces[i].p2].y, objects[j].points[objects[j].faces[i].p2].z);
+				glVertex3f(objects[j].points[objects[j].faces[i].p3].x, objects[j].points[objects[j].faces[i].p3].y, objects[j].points[objects[j].faces[i].p3].z);
+				glEnd();
+			}
+			else if (objects[j].faces[i].type == 2){
+				glBegin(GL_QUADS);
+				glVertex3f(objects[j].points[objects[j].faces[i].p1].x, objects[j].points[objects[j].faces[i].p1].y, objects[j].points[objects[j].faces[i].p1].z);
+				glVertex3f(objects[j].points[objects[j].faces[i].p2].x, objects[j].points[objects[j].faces[i].p2].y, objects[j].points[objects[j].faces[i].p2].z);
+				glVertex3f(objects[j].points[objects[j].faces[i].p3].x, objects[j].points[objects[j].faces[i].p3].y, objects[j].points[objects[j].faces[i].p3].z);
+				glVertex3f(objects[j].points[objects[j].faces[i].p4].x, objects[j].points[objects[j].faces[i].p4].y, objects[j].points[objects[j].faces[i].p4].z);
+				glEnd();
+			}
+			
 			
 		}
 		glPopMatrix();
@@ -520,7 +531,7 @@ void hadleSpecialKeyboard(int key, int x, int y){
 
 int main(int argc, char **argv){
 	//fonte de luz 1:
-	LightSource source1 = LightSource(0, 0 , 1000);
+	LightSource source1 = LightSource(0, 0 , 10);
 	source1.setColor(1, 1, 1);
 	sources.push_back(source1);
 
@@ -528,48 +539,44 @@ int main(int argc, char **argv){
 	LightSource source2 = LightSource(0, 0, 11);
 	source2.setColor(0, 0, 1);
 	//sources.push_back(source2);
-
-	//setando objeto 0:
-	/*objects.push_back(readObject("pumpkin.obj"));
-	objects[0].selectka(0.3);
-	objects[0].selectkd(0.45);
-	objects[0].selectks(1);
-	objects[0].selectq(10);
-	objects[0].selectColor(0.8, 0.4, 0);
-	objects[0].recalculate(source1.location, camera.center);*/
-	//setando objeto 1:
-	/*objects.push_back(readObject("dog.obj"));
-	objects[0].selectka(0.6);
-	objects[0].selectkd(0.5);
-	objects[0].selectks(0.55);
-	objects[0].selectq(1);
-	objects[0].selectColor(1, 1, 1);
-	objects[0].recalculate(source1.location, camera.center);*/
 	
 	//setando objeto:
-	objects.push_back(readObject("Dog.obj"));
+	objects.push_back(readObject("dog.obj"));
 	objects[0].selectka(0.6);
 	objects[0].selectkd(0.5);
 	objects[0].selectks(0.5);
 	objects[0].selectq(1);
-	objects[0].selectColor(1, 1, 0);
+	objects[0].selectColor(1, 1, 1);
 	objects[0].recalculate(source1.location, camera.center);
 
-	//setando objeto 2:
-	objects.push_back(readObject("teste.obj"));
+	/*objects.push_back(readObject("apple.obj"));
 	objects[1].selectka(0.6);
 	objects[1].selectkd(0.5);
 	objects[1].selectks(0.5);
 	objects[1].selectq(1);
-	objects[1].selectColor(1, 0, 1);
-	objects[1].recalculate(source1.location, camera.center);
+	objects[1].selectColor(1, 1, 1);
+	objects[1].recalculate(source1.location, camera.center);*/
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glEnable(GL_DEPTH_TEST);
-	glutInitWindowSize(window_width, window_height);
-	glutCreateWindow("Projeto 1");
 	
+	string hei, wi, all;
+	cin >> all;
+	//all = wi + "x" + hei + ":16@120";
+	glutGameModeString(all.c_str());
+	while (!glutGameModeGet(GLUT_GAME_MODE_POSSIBLE) && all.compare("janela") != 0){
+		cout << "Não pegou" << endl;
+		cin >> all;
+		if (all.compare("janela") == 0) break;
+		//all = wi + "x" + hei + ":32@120";
+		glutGameModeString(all.c_str());
+	}
+	if (all.compare("janela") == 0){
+		glutInitWindowSize(window_width, window_height);
+		glutCreateWindow("Projeto 1");
+	}
+	else glutEnterGameMode();
 	glutDisplayFunc(mydisplay);
 	glutReshapeFunc(myreshape);
 	glutIdleFunc(mydisplay);
