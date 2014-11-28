@@ -18,6 +18,8 @@
 #include <set>
 using namespace std;
 #define PI 3.14159265
+//fglDouble viewport[];
+
 class Object3D
 {
 public:

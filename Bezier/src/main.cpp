@@ -26,7 +26,12 @@ Referencia online para os comandos OpenGL (Man pages):
 using namespace std;
 double window_width = 1080.0;
 double window_height = 1920.0;
+GLdouble modelview[16];
+GLint viewport[4];
+GLdouble projection[16];
 vector<Object3D> objects = vector<Object3D>();
+
+
 int selected_object = 0;
 int selected_light_source = 0;
 int togle = -1;
@@ -34,6 +39,9 @@ double ia = 0.5;
 double id = 0.4;
 double is = 0.25;
 int t = 1;
+double posNear[3];
+double posFar[3];
+
 vector<LightSource> sources = vector<LightSource>();
 bool diretorON = false;
 float ratio;
@@ -41,6 +49,7 @@ double angle = 35;
 double near = 13;
 
 bool dolly = false;
+
 
 //Propriedades da Camera
 Camera camera = Camera(
@@ -71,6 +80,7 @@ void myreshape (GLsizei w, GLsizei h)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity(); 
+
 	glViewport(0, 0, w, h);
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
@@ -86,7 +96,48 @@ void myreshape (GLsizei w, GLsizei h)
 	glDepthFunc(GL_LESS);
 }
 
+void screenToWorld(double x, double y){
 
+	
+	GLdouble pX, pY, pZ;
+	GLdouble winx, winy, winz;
+	
+	for (int i = 0; i < 16; i++){
+		cout << modelview[i] << " ";
+		if (i > 0 && (i+1 )% 4 == 0) printf("\n");
+	}
+	
+
+	
+
+	
+	winx = x;
+	winy = viewport[3] - y;
+	
+	//glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, &winz);
+
+	
+	winz = 3000.0; // o far é 3000
+
+gluUnProject(winx, winy, winz, modelview, projection, viewport, &pX, &pY, &pZ);
+
+
+	posFar[0] = pX;
+	posFar[1] = pY;
+	posFar[2] = pZ;
+
+	winz = 1.0; // o near é 1
+
+	gluUnProject(winx, winy, winz, modelview, projection, viewport, &pX, &pY, &pZ);
+	posNear[0] = pX;
+	posNear[1] = pY;
+	posNear[2] = pZ;
+	
+	cout <<"near: "<< pX << " " << pY << " " << pZ << endl;
+	cout <<"far: " << posFar[0]<< " " << posFar[1]<< " " << posFar[2] << endl;
+	//printf("NEAR: tela-> x: %lf y: %lf mundo-> x: %lf y: %lf z: %lf\n", x, y, posNear[0], posNear[1], posNear[2]);
+	//printf("FAR: tela-> x: %lf y: %lf mundo-> x: %lf y: %lf z: %lf\n", x, y, posFar[0], posFar[1], posFar[2]);
+}
 void drawGrid()
 {
 	double gridL = 26;
@@ -211,8 +262,6 @@ void drawGrid()
 	};
 
 	glEnd();
-
-	glPopMatrix();
 
 	glPopMatrix();
 }
@@ -392,6 +441,75 @@ void drawCamera(Camera camera) {
 	glPopMatrix();*/
 }
 
+void drawPalette(){
+	glColor3f(1, 1, 1);
+	glutSolidCube(300);
+	//glPointSize(10);
+	//glClearColor(1, 1, 1, 1);
+	glPointSize(18);
+	
+
+	glBegin(GL_POINTS);
+	glColor3f(1, 0, 1);
+	glVertex2f(0, 5.25);
+	glColor3f(1, 0, 0.75);
+	glVertex2f(0, 5);
+	glColor3f(1, 0, 0.5);
+	glVertex2f(0, 4.75);
+	glColor3f(1, 0, 0.25);
+	glVertex2f(0, 4.5);
+	glColor3f(1, 0, 0);
+	glVertex2f(0, 4.25);
+	glColor3f(1, 0.25, 0);
+	glVertex2f(0, 4);
+	glColor3f(1, 0.5, 0);
+	glVertex2f(0, 3.75);
+	glColor3f(1, 0.75, 0);
+	glVertex2f(0, 3.5);
+	glColor3f(1, 1, 0);
+	glVertex2f(0, 3.25);
+	glColor3f(0.75, 1, 0);
+	glVertex2f(0, 3);
+	glColor3f(0.5, 1, 0);
+	glVertex2f(0, 2.75);
+	glColor3f(0.25, 1, 0);
+	glVertex2f(0, 2.5);
+	glColor3f(0, 1, 0);
+	glVertex2f(0, 2.25);
+	glColor3f(0, 1, 0.25);
+	glVertex2f(0, 2);
+	glColor3f(0, 1, 0.5);
+	glVertex2f(0, 1.75);
+	glColor3f(0, 1, 0.75);
+	glVertex2f(0, 1.5);
+	glColor3f(0, 1, 1);
+	glVertex2f(0, 1.25);
+	glColor3f(0, 0.75, 1);
+	glVertex2f(0, 1);
+	glColor3f(0, 0.5, 1);
+	glVertex2f(0, 0.75);
+	glColor3f(0, 0.25, 1);
+	glVertex2f(0, 0.5);
+	glColor3f(0, 0, 1);
+	glVertex2f(0, 0.25);
+	glColor3f(0.25, 0, 1);
+	glVertex2f(0, 0);
+	glColor3f(0.5, 0, 1);
+	glVertex2f(0, -0.25);
+	glColor3f(0.75, 0, 1);
+	glVertex2f(0, -0.5);
+	//glColor3f(1, 0, 1);
+	//glVertex2f(0, -0.75);
+
+	glEnd();
+}
+
+void selectColor(float r, float g, float b) {
+	objects[selected_object].r = r;
+	objects[selected_object].g = g;
+	objects[selected_object].b = b;
+}
+
 void mydisplay()
 {
 	myreshape(window_width, window_height);
@@ -411,17 +529,29 @@ void mydisplay()
 		drawGrid();
 
 		//JANELA 2:
-		glViewport(window_width / 2, 0, window_width / 2, window_height);
+		glViewport(window_width / 2, 0, (window_width / 2)-15, window_height);
 		diretor.loadCamera();
 		drawObjects();
 		drawCamera(camera);
 		drawGrid();
+
+		//JANELA PALETA:
+		glViewport(window_width - 15, 0, window_width - (window_width - 15),  window_height );
+		//glMatrixMode(GL_MODELVIEW);
+		//glLoadIdentity();
+		drawPalette();
 	}
 	else {
-		glViewport(0, 0, window_width, window_height);
+		glViewport(0, 0, window_width-15, window_height);
 		camera.loadCamera();
 		drawObjects();
 		drawGrid();
+
+		//JANELA PALETA:
+		glViewport(window_width - 15, 0, window_width - (window_width - 15),  window_height );
+		//glMatrixMode(GL_MODELVIEW);
+		//glLoadIdentity();
+		drawPalette();
 	}
 	glFlush();
 	glutPostRedisplay();
@@ -436,14 +566,36 @@ void handleMotion(int x, int y)
 	mouseInicialY = y;
 	for (int i = 0; i < sources.size(); i++){
 		objects[selected_object].recalculate(sources[i].location, camera.center);
+	
+	if (x < window_width - 15) {
+		camera.RotateMatrix((x - mouseInicialX) / ROTAT_CAMERA, 'y');
+		camera.RotateMatrix((y - mouseInicialY) / ROTAT_CAMERA, 'x');
+		mouseInicialX = x;
+		mouseInicialY = y;
+		for (int i = 0; i < sources.size(); i++){
+			objects[selected_object].recalculate(sources[i].location, camera.center);
+		}
 	}
 }
 
 void handleMouse(int btn, int state, int x, int y)
 {
+	
 	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-		mouseInicialX = x;
-		mouseInicialY = y;
+		if (x < window_width -15) {
+			mouseInicialX = x;
+			mouseInicialY = y;
+			screenToWorld(x, y);
+			//chamar o metodo 
+		}
+		else if (x>=(window_width-15)) {
+			
+			GLfloat arr[3];
+			glReadPixels(x, window_height - y, 1, 1, GL_RGB, GL_FLOAT, arr);
+		//	printf(">>%lf %lf %lf", arr[0], arr[1], arr[2]);
+			selectColor(arr[0], arr[1], arr[2]);
+		}
+		
 	}
 }
 
@@ -578,14 +730,20 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key=='o') {
 		selected_light_source = (selected_light_source + 1) % sources.size();
 	}
-	if (key == 'p') {
+	if (key == 'k') {
 		selected_light_source = (selected_light_source - 1) % sources.size();
 	}
-
 	if (key == '/'){
 		dolly = !dolly;
 	}
-
+	if (key == 'p') {
+		if (PAINT_FACE){
+			PAINT_FACE = false;
+		}
+		else{
+			PAINT_FACE = true;
+		}
+	}
 	if (key == ']') {
 		if (near < 1500){
 			Point3D deslocamento = (camera.directionZ - camera.center)*-MOVE_CAMERA;

@@ -54,6 +54,7 @@ public:
 		Point3D zCamera = center-directionZ;
 		zCamera = zCamera.normalized();
 		glMatrixMode(GL_MODELVIEW);
+		//glGetDoublev(GL_MODELVIEW, modelview);
 		glLoadIdentity();
 		GLfloat extrinsic1[16] = {
 			1, 0, 0, 0,
