@@ -76,7 +76,7 @@ void myreshape (GLsizei w, GLsizei h)
 	window_height = (GLfloat) h;
 
 	if (!dolly){
-		gluPerspective(angle, window_width / window_height, 1, 3000);
+		gluPerspective(angle, ratio, 1, 3000);
 	} else {
 		//glFrustum(frustrumLeft, frustrumRight, frustrumBottom, frustrumTop, near, 3000);
 		glFrustum( -13, 13, -13, 13, near, 3000);
@@ -550,7 +550,6 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key == 'f'){
 		Point3D cameraDirection = (camera.directionZ - camera.center).normalized();
 		Point3D objectDirection = (objects[selected_object].bariCenter - camera.center).normalized();
-		cout << cameraDirection.x - objectDirection.x << endl;
 		if (cameraDirection.x - objectDirection.x <= -0.1){
 			if ((acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)) > 1.02) camera.RotateMatrix(-(acos(cameraDirection.dot(objectDirection))*180.0 / acos(-1)), 'y');
 		}
