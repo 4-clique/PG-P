@@ -35,10 +35,10 @@ double id = 0.4;
 double is = 0.25;
 int t = 1;
 vector<LightSource> sources = vector<LightSource>();
-bool diretorON = false;
+bool diretorON = true;
 
 double angle = 35;
-double near = 8;
+double near = 13;
 
 bool dolly = false;
 
@@ -74,13 +74,12 @@ void myreshape (GLsizei w, GLsizei h)
 	glViewport(0, 0, w, h);
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
-	gluPerspective(30, ratio/2, 1, 3000);
 	
 	if (!dolly){
 		gluPerspective(angle, window_width / window_height, 1, 3000);
 	} else {
 		//glFrustum(frustrumLeft, frustrumRight, frustrumBottom, frustrumTop, near, 3000);
-		glFrustum( -8, 8, -8, 8, near, 3000);
+		glFrustum( -13, 13, -13, 13, near, 3000);
 	}
 	
 	//glFrustum( -3, 3, -3, 3, near, 1000);
@@ -92,7 +91,7 @@ void myreshape (GLsizei w, GLsizei h)
 
 void drawGrid()
 {
-	double gridL = 16;
+	double gridL = 26;
 
 	glPushMatrix();
 	glTranslatef(0, -(gridL / 2), 0);
@@ -369,7 +368,7 @@ void drawCamera(Camera camera) {
 
 void mydisplay()
 {
-
+	myreshape(window_width, window_height);
 	//glClearColor(0, 0, 0, 0);
 	glClearDepth(1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -377,19 +376,22 @@ void mydisplay()
 	double x = 0;
 	double y = 0;
 	double size = 0.5;
-	//myreshape(window_width, window_height);
+	
 	//drawObjects();
 	
 	//JANELA 1:
 	glViewport(0, 0, window_width / 2, window_height); 
 	camera.loadCamera();
 	drawObjects();
+	drawGrid();
 	
 	//JANELA 2:
-	glViewport(window_width / 2, 0, window_width / 2, window_height); 
-	diretor.loadCamera();
-	drawObjects();
-	drawCamera(camera);
+	if (diretorON){
+		glViewport(window_width / 2, 0, window_width / 2, window_height);
+		diretor.loadCamera();
+		drawObjects();
+		drawCamera(camera);
+	}
 	
 	//drawPlane();
 	drawGrid();
@@ -553,10 +555,7 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	}
 
 	if (key == '/'){
-		dolly = true;
-	}
-	if (key == ';'){
-		dolly = false;
+		dolly = !dolly;
 	}
 
 	if (key == ']') {
@@ -703,18 +702,81 @@ int main(int argc, char **argv){
 	objects[0].selectColor(1, 1, 1);
 	objects[0].recalculate(source1.location, camera.center);
 
-	/*objects.push_back(readObject("apple.obj"));
+	objects.push_back(readObject("camel.obj"));
 	objects[1].selectka(0.6);
 	objects[1].selectkd(0.5);
 	objects[1].selectks(0.5);
 	objects[1].selectq(1);
 	objects[1].selectColor(1, 1, 1);
-	objects[1].recalculate(source1.location, camera.center);*/
+	objects[1].recalculate(source1.location, camera.center);
+
+	objects.push_back(readObject("CAT.obj"));
+	objects[2].selectka(0.6);
+	objects[2].selectkd(0.5);
+	objects[2].selectks(0.5);
+	objects[2].selectq(1);
+	objects[2].selectColor(1, 1, 1);
+	objects[2].recalculate(source1.location, camera.center);
+
+	objects.push_back(readObject("chimp.obj"));
+	objects[3].selectka(0.6);
+	objects[3].selectkd(0.5);
+	objects[3].selectks(0.5);
+	objects[3].selectq(1);
+	objects[3].selectColor(1, 1, 1);
+	objects[3].recalculate(source1.location, camera.center);
+
+	objects.push_back(readObject("cow.obj"));
+	objects[4].selectka(0.6);
+	objects[4].selectkd(0.5);
+	objects[4].selectks(0.5);
+	objects[4].selectq(1);
+	objects[4].selectColor(1, 1, 1);
+	objects[4].recalculate(source1.location, camera.center);
+
+	objects.push_back(readObject("lion.obj"));
+	objects[5].selectka(0.6);
+	objects[5].selectkd(0.5);
+	objects[5].selectks(0.5);
+	objects[5].selectq(1);
+	objects[5].selectColor(1, 1, 1);
+	objects[5].recalculate(source1.location, camera.center);
+
+	objects.push_back(readObject("venus.obj"));
+	objects[6].selectka(0.6);
+	objects[6].selectkd(0.5);
+	objects[6].selectks(0.5);
+	objects[6].selectq(1);
+	objects[6].selectColor(1, 1, 1);
+	objects[6].recalculate(source1.location, camera.center);
+
+	objects.push_back(readObject("whale.obj"));
+	objects[7].selectka(0.6);
+	objects[7].selectkd(0.5);
+	objects[7].selectks(0.5);
+	objects[7].selectq(1);
+	objects[7].selectColor(1, 1, 1);
+	objects[7].recalculate(source1.location, camera.center);
+
+	objects.push_back(readObject("spheretri.obj"));
+	objects[8].selectka(0.6);
+	objects[8].selectkd(0.5);
+	objects[8].selectks(0.5);
+	objects[8].selectq(1);
+	objects[8].selectColor(1, 1, 1);
+	objects[8].recalculate(source1.location, camera.center);
+
+	objects.push_back(readObject("cube.obj"));
+	objects[9].selectka(0.6);
+	objects[9].selectkd(0.5);
+	objects[9].selectks(0.5);
+	objects[9].selectq(1);
+	objects[9].selectColor(1, 1, 1);
+	objects[9].recalculate(source1.location, camera.center);
 	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
 	glEnable(GL_DEPTH_TEST);
-	
 	string hei, wi, all;
 	cin >> all;
 	//all = wi + "x" + hei + ":16@120";
