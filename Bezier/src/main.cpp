@@ -38,7 +38,9 @@ vector<LightSource> sources = vector<LightSource>();
 bool diretorON = false;
 
 double angle = 35;
-double near = 1;
+double near = 8;
+
+bool dolly = false;
 
 //Propriedades da Camera
 Camera camera = Camera(
@@ -67,26 +69,169 @@ void myreshape (GLsizei w, GLsizei h)
 		h = 1;
 	float ratio = w * 1.0 / h; // ratio dá no msm do w/h, só que tem isso de haver o retorno do h como 0, o que causa erro
 
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity(); 
 	glViewport(0, 0, w, h);
 	window_width = (GLfloat) w;
 	window_height = (GLfloat) h;
 	gluPerspective(30, ratio/2, 1, 3000);
+	
+	if (!dolly){
+		gluPerspective(angle, window_width / window_height, 1, 3000);
+	} else {
+		//glFrustum(frustrumLeft, frustrumRight, frustrumBottom, frustrumTop, near, 3000);
+		glFrustum( -8, 8, -8, 8, near, 3000);
+	}
+	
+	//glFrustum( -3, 3, -3, 3, near, 1000);
+	
 	glEnable(GL_DEPTH_TEST); //add profundidade, opcional (ver se fica melhor com ou sem)
 	glDepthFunc(GL_LESS);
 }
 
 
+void drawGrid()
+{
+	double gridL = 16;
+
+	glPushMatrix();
+	glTranslatef(0, -(gridL / 2), 0);
+
+	glPushMatrix();
+
+	glTranslatef(-(gridL / 2), 0, -(gridL / 2));
+
+	glColor3f(.3, .3, .3);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(i, 0, 0);
+		glVertex3f(i, 0, gridL);
+		glVertex3f(0, 0, i);
+		glVertex3f(gridL, 0, i);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef(-(gridL / 2), 0, -(gridL / 2));
+
+	glColor3f(1, 0, 0);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(i, 0, 0);
+		glVertex3f(i, gridL, 0);
+		glVertex3f(0, i, 0);
+		glVertex3f(gridL, i, 0);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef(-(gridL / 2), 0, -(gridL / 2));
+
+	glColor3f(.3, .3, .3);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(0, i, 0);
+		glVertex3f(0, i, gridL);
+		glVertex3f(0, 0, i);
+		glVertex3f(0, gridL, i);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef((gridL / 2), 0, -(gridL / 2));
+
+	glColor3f(.3, .3, .3);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(0, i, 0);
+		glVertex3f(0, i, gridL);
+		glVertex3f(0, 0, i);
+		glVertex3f(0, gridL, i);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef(-(gridL / 2), 0, (gridL / 2));
+
+	glColor3f(.3, .3, .3);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(i, 0, 0);
+		glVertex3f(i, gridL, 0);
+		glVertex3f(0, i, 0);
+		glVertex3f(gridL, i, 0);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glTranslatef(-(gridL / 2), gridL, -(gridL / 2));
+
+	glColor3f(.3, .3, .3);
+
+	glBegin(GL_LINES);
+
+	for (int i = 0; i <= gridL; i++)
+	{
+		glVertex3f(i, 0, 0);
+		glVertex3f(i, 0, gridL);
+		glVertex3f(0, 0, i);
+		glVertex3f(gridL, 0, i);
+	};
+
+	glEnd();
+
+	glPopMatrix();
+
+	glPopMatrix();
+}
 void drawPlane(){
 	glColor3f(.3, .3, .3);
 	glBegin(GL_QUADS);
-	glVertex3f(0, -5, 0);
+	glVertex3f(-20, -5, near);
+	glVertex3f(-20, -5, 10);
+	glVertex3f(20, -5, 10);
+	glVertex3f(20, -5, near);
+	glEnd();
+
+	/*glVertex3f(0, -5, 0);
 	glVertex3f(0, -5, 10);
 	glVertex3f(10, -5, 10);
-	glVertex3f(10, -5, 0);
-	glEnd();
+	glVertex3f(10, -5, 0);*/
 
 	glBegin(GL_LINES);
 	for (int i = 0; i <= 10; i++) {
@@ -246,6 +391,8 @@ void mydisplay()
 	drawObjects();
 	drawCamera(camera);
 	
+	//drawPlane();
+	drawGrid();
 	glFlush();
 	glutPostRedisplay();
 }
@@ -404,25 +551,32 @@ void hadleKeyboard(unsigned char key, int x, int y)
 	if (key == 'p') {
 		selected_light_source = (selected_light_source - 1) % sources.size();
 	}
-	if (key == '[') {
-		if (angle < 64){
-			angle += 0.275;
-			Point3D deslocamento = (camera.directionZ - camera.center)*0.1;
-			camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
-			for (int i = 0; i < sources.size(); i++){
-				objects[selected_object].recalculate(sources[i].location, camera.center);
-			}
-		}
-		
+
+	if (key == '/'){
+		dolly = true;
 	}
+	if (key == ';'){
+		dolly = false;
+	}
+
 	if (key == ']') {
-		if (angle > 35){
-			angle -= 0.275;
-			Point3D deslocamento = (camera.directionZ - camera.center)*-0.1;
+		if (near < 1500){
+			Point3D deslocamento = (camera.directionZ - camera.center)*-MOVE_CAMERA;
 			camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
 			for (int i = 0; i < sources.size(); i++){
 				objects[selected_object].recalculate(sources[i].location, camera.center);
 			}
+			near += deslocamento.module();
+		}
+	}
+	if (key == '[') {
+		if (near > 1){
+			Point3D deslocamento = (camera.directionZ - camera.center)*MOVE_CAMERA;
+			camera.translate(deslocamento.x, deslocamento.y, deslocamento.z);
+			for (int i = 0; i < sources.size(); i++){
+				objects[selected_object].recalculate(sources[i].location, camera.center);
+			}
+			near -= deslocamento.module();
 		}
 	}
 }
