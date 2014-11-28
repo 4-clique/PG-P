@@ -1,21 +1,43 @@
-﻿Build started 31/10/2014 15:48:17.
-     1>Project "C:\Users\Stor\Desktop\VictorM\PG-P\Bezier\Bezier.vcxproj" on node 2 (Build target(s)).
-     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(381,5): warning MSB8028: The intermediate directory (C:\Users\Stor\Desktop\VictorM\PG-P\Debug\) contains files shared from another project (Bezier.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+﻿Build started 27/11/2014 23:18:59.
+     1>Project "C:\Users\Simone Cohen\Documents\GitHub\PG-P\Bezier\Bezier.vcxproj" on node 2 (Build target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(381,5): warning MSB8028: The intermediate directory (C:\Users\Simone Cohen\Documents\GitHub\PG-P\Debug\) contains files shared from another project (Bezier.vcxproj).  This can lead to incorrect clean and rebuild behavior.
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\Stor\Desktop\VictorM\PG-P\Bezier\include\\" /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\\" /Fd"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt src\main.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\Simone Cohen\Documents\GitHub\PG-P\Bezier\include\\" /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\Simone Cohen\Documents\GitHub\PG-P\Debug\\" /Fd"C:\Users\Simone Cohen\Documents\GitHub\PG-P\Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt src\main.cpp
          main.cpp
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(53): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(59): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(65): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(75): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\include\object3d.h(81): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\src\main.cpp(55): warning C4018: '<' : signed/unsigned mismatch
-     1>c:\users\stor\desktop\victorm\pg-p\bezier\src\main.cpp(64): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\include\object3d.h(64): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\include\object3d.h(77): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\include\object3d.h(83): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\include\object3d.h(89): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\include\object3d.h(129): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\include\object3d.h(151): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\include\object3d.h(157): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\include\transform.h(40): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\include\camera.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(271): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(277): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(281): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(347): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(369): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(375): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(381): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(387): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(393): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(399): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(405): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(411): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(417): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(436): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(443): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(451): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(458): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(511): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\simone cohen\documents\github\pg-p\bezier\src\main.cpp(521): warning C4018: '<' : signed/unsigned mismatch
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\ProjetoPG.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Stor\Desktop\VictorM\PG-P\Bezier\lib\\" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\ProjetoPG.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Stor\Desktop\VictorM\PG-P\Debug\ProjetoPG.lib" /MACHINE:X86 "C:\Users\Stor\Desktop\VictorM\PG-P\Debug\main.obj"
-         Bezier.vcxproj -> C:\Users\Stor\Desktop\VictorM\PG-P\Debug\ProjetoPG.exe
-     1>Done Building Project "C:\Users\Stor\Desktop\VictorM\PG-P\Bezier\Bezier.vcxproj" (Build target(s)).
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Simone Cohen\Documents\GitHub\PG-P\Debug\ProjetoPG.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Simone Cohen\Documents\GitHub\PG-P\Bezier\lib\\" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Simone Cohen\Documents\GitHub\PG-P\Debug\ProjetoPG.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Simone Cohen\Documents\GitHub\PG-P\Debug\ProjetoPG.lib" /MACHINE:X86 "C:\Users\Simone Cohen\Documents\GitHub\PG-P\Debug\main.obj"
+         LINK : C:\Users\Simone Cohen\Documents\GitHub\PG-P\Debug\ProjetoPG.exe not found or not built by the last incremental link; performing full link
+         Bezier.vcxproj -> C:\Users\Simone Cohen\Documents\GitHub\PG-P\Debug\ProjetoPG.exe
+     1>Done Building Project "C:\Users\Simone Cohen\Documents\GitHub\PG-P\Bezier\Bezier.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:01.08
+Time Elapsed 00:02:14.14

@@ -99,33 +99,7 @@ public:
 		/*cout << directionX.x << " " << directionX.y << " " << directionX.z << endl;
 		cout << directionZ.x << " " << directionZ.y << " " << directionZ.z << endl;*/
 		translate(c.x, c.y, c.z);
-		//translate(-center.x, -center.y, -center.z);
-		//translate(c.x, c.y, c.z);
-		/*Point3D c = Point3D(center.x, center.y, center.z);
-		center.x -= c.x;
-		direction.x -= c.x;
-		center.y -= c.y;
-		direction.y -= c.y;
-		center.z -= c.z;
-		direction.z -= c.z;
-		if (axis == 'x'){
-			double y = direction.y;
-			double z = direction.z;
-			direction.y = cos((acos(-1.0)*degrees) / 180.0)*y - sin((acos(-1.0)*degrees) / 180.0) * z;
-			direction.z = sin((acos(-1.0)*degrees) / 180.0)*y + cos((acos(-1.0)*degrees) / 180.0)*z;
-		}
-		else if (axis == 'y') {
-			double x = direction.x;
-			double z = direction.z;
-			direction.x = cos((acos(-1.0)*degrees) / 180.0)*x + sin((acos(-1.0)*degrees) / 180.0) * z;
-			direction.z = cos((acos(-1.0)*degrees) / 180.0)*z - sin((acos(-1.0)*degrees) / 180.0)*x;
-		}
-		center.x += c.x;
-		direction.x += c.x;
-		center.y += c.y;
-		direction.y += c.y;
-		center.z += c.z;
-		direction.z += c.z;*/
+		
 	};
 
 private:
