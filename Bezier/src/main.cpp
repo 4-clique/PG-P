@@ -264,6 +264,8 @@ void drawGrid()
 	glEnd();
 
 	glPopMatrix();
+
+	glPopMatrix();
 }
 void drawPlane(){
 	glColor3f(.3, .3, .3);
@@ -564,7 +566,7 @@ void handleMotion(int x, int y)
 	camera.RotateMatrix((y - mouseInicialY) / ROTAT_CAMERA, 'x');
 	mouseInicialX = x;
 	mouseInicialY = y;
-	for (int i = 0; i < sources.size(); i++){
+	for (int i = 0; i < sources.size(); i++)
 		objects[selected_object].recalculate(sources[i].location, camera.center);
 	
 	if (x < window_width - 15) {
@@ -578,8 +580,7 @@ void handleMotion(int x, int y)
 	}
 }
 
-void handleMouse(int btn, int state, int x, int y)
-{
+void handleMouse(int btn, int state, int x, int y){
 	
 	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
 		if (x < window_width -15) {
