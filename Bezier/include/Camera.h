@@ -12,6 +12,8 @@ public:
 	Point3D directionX;
 	Point3D directionY;
 	Point3D directionZ;
+	                
+	
 	Camera(){};
 	Camera(Point3D c, Point3D xAxes, Point3D yAxes, Point3D zAxes){
 		center = c;
@@ -28,6 +30,7 @@ public:
 		Point3D zCamera = center-directionZ;
 		zCamera = zCamera.normalized();
 		glMatrixMode(GL_MODELVIEW);
+		//glGetDoublev(GL_MODELVIEW, modelview);
 		glLoadIdentity();
 		//glGetDoublev(GL_MODELVIEW_MATRIX, modelview);               // Where The 16 Doubles Of The Projection Matrix Are To Be Stored
 		//glGetDoublev(GL_PROJECTION_MATRIX, projection);
